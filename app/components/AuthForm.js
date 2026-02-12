@@ -30,7 +30,7 @@ export default function AuthForm() {
         router.push('/dashboard')
       } else {
         // Registro a través de API route
-        const response = await fetch('/api/auth/signup', {
+        const response = await fetch('/api/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
