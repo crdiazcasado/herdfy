@@ -29,21 +29,26 @@ export default function AuthForm() {
         if (error) throw error
         router.push('/dashboard')
       } else {
-        // Registro - el trigger creará automáticamente el perfil
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              name: name, // Esto se pasa al trigger
-            }
-          }
+        // Registro a través de API route
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password, name }),
         })
-        
-        if (authError) throw authError
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Error al crear la cuenta')
+        }
 
         alert('¡Cuenta creada! Ya puedes iniciar sesión.')
         setIsLogin(true)
+        setEmail('')
+        setPassword('')
+        setName('')
       }
     } catch (error) {
       setError(error.message)
