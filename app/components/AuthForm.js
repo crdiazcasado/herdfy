@@ -29,30 +29,20 @@ export default function AuthForm() {
         if (error) throw error
         router.push('/dashboard')
       } else {
-        // Registro
+        // Registro - el trigger creará automáticamente el perfil
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              name: name, // Esto se pasa al trigger
+            }
+          }
         })
         
         if (authError) throw authError
 
-        // Crear perfil en tabla users
-        if (authData.user) {
-          const { error: profileError } = await supabase
-            .from('users')
-            .insert([
-              {
-                id: authData.user.id,
-                email: email,
-                name: name,
-              }
-            ])
-          
-          if (profileError) throw profileError
-        }
-
-        alert('¡Cuenta creada! Revisa tu email para confirmar tu cuenta.')
+        alert('¡Cuenta creada! Ya puedes iniciar sesión.')
         setIsLogin(true)
       }
     } catch (error) {
