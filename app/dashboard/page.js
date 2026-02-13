@@ -1,34 +1,45 @@
-import { cookies } from 'next/headers'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { redirect } from 'next/navigation'
+import { supabase } from '../../lib/supabase'
 
-async function getUserCampaigns() {
-  const supabase = createServerComponentClient({ cookies })
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    redirect('/login')
+export default function Dashboard() {
+  const [campaigns, setCampaigns] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    checkUser()
+  }, [])
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    setUser(user)
+    loadCampaigns(user.id)
   }
 
-  const { data, error } = await supabase
-    .from('campaigns')
-    .select('*')
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false })
-  
-  if (error) {
-    console.error('Error fetching campaigns:', error)
-    return []
+  const loadCampaigns = async (userId) => {
+    const { data, error } = await supabase
+      .from('campaigns')
+      .select('*')
+      .eq('created_by', userId)
+      .order('created_at', { ascending: false })
+    
+    if (!error && data) {
+      setCampaigns(data)
+    }
+    setLoading(false)
   }
-  
-  return data
-}
-
-export default async function Dashboard() {
-  const campaigns = await getUserCampaigns()
 
   const formatDate = (dateString) => {
     const date = new Date(dateString)
@@ -69,7 +80,11 @@ export default async function Dashboard() {
             </a>
           </div>
 
-          {campaigns.length > 0 ? (
+          {loading ? (
+            <div className="bg-white p-12 rounded-lg shadow-sm border border-gray-200 text-center">
+              <p className="text-gray-500">Cargando campañas...</p>
+            </div>
+          ) : campaigns.length > 0 ? (
             <div className="space-y-4">
               {campaigns.map((campaign) => (
                 <div key={campaign.id} className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
