@@ -20,7 +20,6 @@ export default function AuthForm() {
 
     try {
       if (isLogin) {
-        // Login
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -29,7 +28,6 @@ export default function AuthForm() {
         if (error) throw error
         router.push('/dashboard')
       } else {
-        // Registro a través de API route
         const response = await fetch('/api/signup', {
           method: 'POST',
           headers: {
