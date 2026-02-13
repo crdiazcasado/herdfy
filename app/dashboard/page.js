@@ -16,7 +16,7 @@ async function getUserCampaigns() {
   const { data, error } = await supabase
     .from('campaigns')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('created_by', user.id)
     .order('created_at', { ascending: false })
   
   if (error) {
