@@ -28,7 +28,7 @@ export default function AuthForm() {
         if (error) throw error
         router.push('/dashboard')
       } else {
-        const response = await fetch('/api/signup', {
+        const response = await fetch('/api/campaigns/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
