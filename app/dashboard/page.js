@@ -1,11 +1,22 @@
+import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { supabase } from '../../lib/supabase'
+import { redirect } from 'next/navigation'
 
-async function getAllCampaigns() {
+async function getUserCampaigns() {
+  const supabase = createServerComponentClient({ cookies })
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) {
+    redirect('/login')
+  }
+
   const { data, error } = await supabase
     .from('campaigns')
     .select('*')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
   
   if (error) {
@@ -17,7 +28,7 @@ async function getAllCampaigns() {
 }
 
 export default async function Dashboard() {
-  const campaigns = await getAllCampaigns()
+  const campaigns = await getUserCampaigns()
 
   const formatDate = (dateString) => {
     const date = new Date(dateString)
