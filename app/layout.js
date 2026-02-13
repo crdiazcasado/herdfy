@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Herdfy",
-  description: "Cuando el rebaño actúa, las cosas cambian.",
+  title: "Herdfy - Cuando el rebaño actúa, las cosas cambian.",
+  description: "Plataforma de creación de campañas sociales.",
 };
 
 export default function RootLayout({ children }) {
