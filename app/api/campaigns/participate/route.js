@@ -1,6 +1,5 @@
 import { supabase } from '../../../../lib/supabase'
 import { NextResponse } from 'next/server'
-
 export async function POST(request) {
   try {
     const { slug } = await request.json()
@@ -11,12 +10,17 @@ export async function POST(request) {
         { status: 400 }
       )
     }
-
     // Incrementar contador de participaciones
+    const { data: campaign } = await supabase
+      .from('campaigns')
+      .select('participation_count')
+      .eq('slug', slug)
+      .single()
+
     const { data, error } = await supabase
       .from('campaigns')
       .update({ 
-        participation_count: supabase.raw('participation_count + 1')
+        participation_count: (campaign?.participation_count || 0) + 1
       })
       .eq('slug', slug)
       .select()
@@ -28,7 +32,6 @@ export async function POST(request) {
         { status: 500 }
       )
     }
-
     return NextResponse.json({ 
       success: true, 
       participation_count: data[0]?.participation_count 
