@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import UserMenu from './UserMenu'
+import CreateCampaignButton from './CreateCampaignButton'
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -10,22 +11,23 @@ export default function Navbar() {
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
+
+          {/* Logo */}
           <a href="/" className="flex items-center gap-2">
             <span className="text-2xl">🐑</span>
             <span className="text-xl font-bold text-gray-900">Herdfy</span>
           </a>
 
+          {/* Desktop */}
           <div className="hidden md:flex items-center gap-6">
-            <a 
-              href="/"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
-            >
+            <a href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
               Campañas
             </a>
-            
+            <CreateCampaignButton />
             <UserMenu />
           </div>
 
+          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -43,16 +45,19 @@ export default function Navbar() {
           </button>
         </div>
 
+        {/* Mobile menu */}
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 border-t border-gray-200">
-            <a 
+            <a
               href="/"
               className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Campañas
             </a>
-            
+            <div className="px-4 py-2">
+              <CreateCampaignButton mobile onClose={() => setMobileMenuOpen(false)} />
+            </div>
             <div className="border-t border-gray-200 pt-3 px-4">
               <UserMenu mobile onClose={() => setMobileMenuOpen(false)} />
             </div>

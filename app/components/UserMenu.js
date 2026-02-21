@@ -14,7 +14,6 @@ export default function UserMenu({ mobile = false, onClose }) {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
     }
-    
     getUser()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -32,45 +31,45 @@ export default function UserMenu({ mobile = false, onClose }) {
     router.refresh()
   }
 
+  // --- NO LOGUEADO ---
   if (!user) {
+    if (mobile) {
+      return (
+        <a
+          href="/login"
+          className="block px-4 py-3 text-center border border-primary text-primary rounded-lg hover:bg-primary/5 transition-colors font-medium"
+          onClick={onClose}
+        >
+          Iniciar sesión
+        </a>
+      )
+    }
     return (
-      <a 
+      <a
         href="/login"
-        className={mobile 
-          ? "block px-4 py-3 bg-primary text-white text-center rounded-lg hover:bg-primary-hover transition-colors font-medium"
-          : "px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
-        }
+        className="px-6 py-2 border border-primary text-primary rounded-lg hover:bg-primary/5 transition-colors font-medium"
         onClick={onClose}
       >
-        Crear campaña
+        Iniciar sesión
       </a>
     )
   }
 
+  // --- MOBILE LOGUEADO ---
   if (mobile) {
     return (
       <div className="space-y-2">
         <div className="px-4 py-2 bg-gray-50 rounded-lg">
           <p className="text-xs text-gray-500">Conectado como</p>
-          <p className="text-sm font-medium text-gray-900 truncate">
-            {user.email}
-          </p>
+          <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
         </div>
-        
+
         <a
           href="/dashboard"
           className="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-primary rounded-lg transition-colors font-medium"
           onClick={onClose}
         >
           📊 Mis campañas
-        </a>
-
-        <a
-          href="/dashboard/nueva"
-          className="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-primary rounded-lg transition-colors font-medium"
-          onClick={onClose}
-        >
-          ➕ Nueva campaña
         </a>
 
         <button
@@ -83,6 +82,7 @@ export default function UserMenu({ mobile = false, onClose }) {
     )
   }
 
+  // --- DESKTOP LOGUEADO ---
   return (
     <div className="relative">
       <button
@@ -99,37 +99,18 @@ export default function UserMenu({ mobile = false, onClose }) {
 
       {showMenu && (
         <div>
-          <div 
-            className="fixed inset-0 z-10"
-            onClick={() => setShowMenu(false)}
-          />
-          
+          <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
           <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-100">
               <p className="text-sm text-gray-500">Conectado como</p>
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {user.email}
-              </p>
+              <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
             </div>
-            
-            <button
-              onClick={() => {
-                setShowMenu(false)
-                router.push('/dashboard')
-              }}
-              className="w-full text-left block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              📊 Mis campañas
-            </button>
 
             <button
-              onClick={() => {
-                setShowMenu(false)
-                router.push('/dashboard/nueva')
-              }}
-              className="w-full text-left block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+              onClick={() => { setShowMenu(false); router.push('/dashboard') }}
+              className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              ➕ Nueva campaña
+              📊 Mis campañas
             </button>
 
             <button

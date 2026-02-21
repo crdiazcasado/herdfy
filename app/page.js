@@ -110,7 +110,7 @@ export default function Home() {
                   onClick={handleSearch}
                   className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium text-base md:text-lg"
                 >
-                  🔍 Buscar
+                  Buscar
                 </button>
               </div>
               

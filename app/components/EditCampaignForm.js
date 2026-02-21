@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
+import Modal from './Modal'
+import { containsProfanity } from '../../lib/profanityFilter'
 
 export default function EditCampaignForm({ campaign }) {
   const router = useRouter()
@@ -10,7 +12,8 @@ export default function EditCampaignForm({ campaign }) {
   const [error, setError] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'success' })
+
   const [formData, setFormData] = useState({
     title: campaign.title,
     description: campaign.description,
@@ -23,6 +26,10 @@ export default function EditCampaignForm({ campaign }) {
     status: campaign.status
   })
 
+  const showModal = (title, message, type = 'success') => {
+    setModal({ isOpen: true, title, message, type })
+  }
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setFormData(prev => ({
@@ -31,10 +38,31 @@ export default function EditCampaignForm({ campaign }) {
     }))
   }
 
+  const validateContent = () => {
+    const fieldsToCheck = [
+      formData.title,
+      formData.description,
+      formData.email_template,
+      formData.email_subject,
+      formData.recipient_name
+    ]
+    return fieldsToCheck.some(field => containsProfanity(field))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+
+    if (validateContent()) {
+      showModal(
+        'Contenido no permitido',
+        'El texto contiene palabras no permitidas. Por favor, revisa los campos y vuelve a intentarlo.',
+        'error'
+      )
+      setLoading(false)
+      return
+    }
 
     try {
       const { error: updateError } = await supabase
@@ -54,10 +82,12 @@ export default function EditCampaignForm({ campaign }) {
 
       if (updateError) throw updateError
 
-      alert('¡Campaña actualizada con éxito!')
-      router.push('/dashboard')
-      router.refresh()
-      
+      showModal('¡Cambios guardados!', 'La campaña se ha actualizado correctamente.', 'success')
+      setTimeout(() => {
+        router.push('/dashboard')
+        router.refresh()
+      }, 1800)
+
     } catch (err) {
       setError(err.message)
     } finally {
@@ -77,10 +107,10 @@ export default function EditCampaignForm({ campaign }) {
 
       if (deleteError) throw deleteError
 
-      alert('Campaña eliminada')
+      // Redirigir directamente, sin alert
       router.push('/dashboard')
       router.refresh()
-      
+
     } catch (err) {
       setError(err.message)
       setDeleting(false)
@@ -90,6 +120,14 @@ export default function EditCampaignForm({ campaign }) {
 
   return (
     <>
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() => setModal(prev => ({ ...prev, isOpen: false }))}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+      />
+
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
@@ -97,17 +135,14 @@ export default function EditCampaignForm({ campaign }) {
           </div>
         )}
 
+        {/* Información básica */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Información básica
-          </h2>
-          
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Información básica</h2>
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Título de la campaña *
-              </label>
-              <input 
+              <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
+              <input
                 type="text"
                 name="title"
                 value={formData.title}
@@ -118,10 +153,8 @@ export default function EditCampaignForm({ campaign }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Descripción *
-              </label>
-              <textarea 
+              <label className="block text-sm font-medium text-gray-700 mb-1">Descripción *</label>
+              <textarea
                 rows="6"
                 name="description"
                 value={formData.description}
@@ -132,10 +165,8 @@ export default function EditCampaignForm({ campaign }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Fecha límite *
-              </label>
-              <input 
+              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha límite *</label>
+              <input
                 type="date"
                 name="deadline"
                 value={formData.deadline}
@@ -146,9 +177,7 @@ export default function EditCampaignForm({ campaign }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Estado *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
               <select
                 name="status"
                 value={formData.status}
@@ -163,17 +192,14 @@ export default function EditCampaignForm({ campaign }) {
           </div>
         </div>
 
+        {/* Destinatario */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Destinatario
-          </h2>
-          
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Destinatario</h2>
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nombre del organismo *
-              </label>
-              <input 
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del organismo *</label>
+              <input
                 type="text"
                 name="recipient_name"
                 value={formData.recipient_name}
@@ -184,10 +210,8 @@ export default function EditCampaignForm({ campaign }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email de destino *
-              </label>
-              <input 
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email de destino *</label>
+              <input
                 type="email"
                 name="recipient_email"
                 value={formData.recipient_email}
@@ -199,17 +223,14 @@ export default function EditCampaignForm({ campaign }) {
           </div>
         </div>
 
+        {/* Plantilla */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Plantilla del mensaje
-          </h2>
-          
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Plantilla del mensaje</h2>
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Asunto del email *
-              </label>
-              <input 
+              <label className="block text-sm font-medium text-gray-700 mb-1">Asunto del email *</label>
+              <input
                 type="text"
                 name="email_subject"
                 value={formData.email_subject}
@@ -220,10 +241,21 @@ export default function EditCampaignForm({ campaign }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Cuerpo del mensaje *
-              </label>
-              <textarea 
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cuerpo del mensaje *</label>
+
+              {/* Variables destacadas */}
+              <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-900">
+                <p className="font-medium mb-2">📌 Variables disponibles para personalizar el mensaje:</p>
+                <div className="flex flex-wrap gap-2">
+                  {['(NOMBRE)', '(DNI)', '(LOCALIDAD)'].map(v => (
+                    <span key={v} className="inline-flex items-center px-2.5 py-1 rounded-md bg-amber-200 text-amber-900 font-mono font-semibold text-xs border border-amber-400">
+                      {v}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <textarea
                 rows="12"
                 name="email_template"
                 value={formData.email_template}
@@ -234,7 +266,7 @@ export default function EditCampaignForm({ campaign }) {
             </div>
 
             <div className="flex items-center">
-              <input 
+              <input
                 type="checkbox"
                 id="allow_edit"
                 name="allow_edit"
@@ -249,9 +281,10 @@ export default function EditCampaignForm({ campaign }) {
           </div>
         </div>
 
+        {/* Acciones */}
         <div className="space-y-3">
           <div className="flex gap-4">
-            <button 
+            <button
               type="submit"
               disabled={loading}
               className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium disabled:opacity-50"
@@ -265,37 +298,39 @@ export default function EditCampaignForm({ campaign }) {
             >
               Cancelar
             </button>
-            <button 
-            type="button"
-            onClick={() => setShowDeleteConfirm(true)}
-            className="flex-1 px-6 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium border border-red-200"
-          >
-            🗑️ Eliminar campaña
-          </button>
+            <button
+              type="button"
+              onClick={() => setShowDeleteConfirm(true)}
+              className="flex-1 px-6 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium border border-red-200"
+            >
+              🗑️ Eliminar campaña
+            </button>
           </div>
         </div>
       </form>
 
+      {/* Modal de confirmación para eliminar */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
+          <div
             className="absolute inset-0 bg-black bg-opacity-50"
             onClick={() => setShowDeleteConfirm(false)}
           />
-          
-          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 z-10">
+            <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">🗑️</span>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">
               ¿Eliminar campaña?
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-6 text-center">
               Esta acción no se puede deshacer. La campaña y todas sus participaciones se eliminarán permanentemente.
             </p>
-            
             <div className="flex gap-3">
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className="flex-1 px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 font-medium"
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 font-medium"
               >
                 {deleting ? 'Eliminando...' : 'Sí, eliminar'}
               </button>
