@@ -47,24 +47,14 @@ export default function CampaignDetailClient({ recipientName, recipientEmail, ca
         campaign={campaign}
       />
 
+      {/* Caja destinatario */}
       <div className="bg-white p-6 rounded-lg border border-gray-300">
-        <div className="flex items-start justify-between mb-3">
-          <h2 className="text-xl font-semibold text-gray-900">
-            📧 Destinatario
-          </h2>
-          {/* Botón denunciar */}
-          <button
-            onClick={() => setReportOpen(true)}
-            className="text-xs text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"
-          >
-            <span>⚑</span>
-            <span>Denunciar</span>
-          </button>
-        </div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-3">
+          📧 Destinatario
+        </h2>
 
         <p className="text-gray-700 font-medium">{recipientName}</p>
 
-        {/* Email con botón copiar */}
         <div className="flex items-center gap-2 mt-2">
           <p className="text-gray-600 text-sm flex-1">{recipientEmail}</p>
           <button

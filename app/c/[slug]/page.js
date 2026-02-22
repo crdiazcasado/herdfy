@@ -3,6 +3,7 @@ import Footer from '../../components/Footer'
 import ParticipationForm from '../../components/ParticipationForm'
 import ShareButton from '../../components/ShareButton'
 import CampaignDetailClient from '../../components/CampaignDetailClient'
+import ReportButton from '../../components/ReportButton'
 import { supabase } from '../../../lib/supabase'
 import { notFound } from 'next/navigation'
 
@@ -92,20 +93,25 @@ export default async function CampaignDetail({ params }) {
               campaign={campaign}
             />
 
-            {/* Participación */}
+            {/* Participación + WhatsApp + Denunciar */}
             <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
               <div className="p-6">
                 <ParticipationForm campaign={campaign} />
               </div>
 
-              {/* WhatsApp justo debajo */}
-              <div className="px-6 pb-6 pt-0">
+              {/* WhatsApp */}
+              <div className="px-6 pb-4">
                 <div className="border-t border-gray-200 pt-4">
                   <p className="text-sm text-gray-500 mb-3 font-medium">
                     📣 ¿Conoces a alguien que también debería participar? ¡Comparte!
                   </p>
                   <ShareButton campaign={campaign} />
                 </div>
+              </div>
+
+              {/* Denunciar — debajo del WhatsApp */}
+              <div className="px-6 pb-6">
+                <ReportButton campaign={campaign} />
               </div>
             </div>
 
