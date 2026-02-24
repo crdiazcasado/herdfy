@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import Link from 'next/link'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import CampaignCard from './components/CampaignCard'
@@ -15,82 +16,63 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const loadCampaigns = async () => {
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select(`*, users (name, email)`)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+
+      if (!error && data) {
+        setCampaigns(data)
+        setFilteredCampaigns(data)
+      }
+      setLoading(false)
+    }
     loadCampaigns()
   }, [])
 
-  const loadCampaigns = async () => {
-    const { data, error } = await supabase
-      .from('campaigns')
-      .select(`
-        *,
-        users (
-          name,
-          email
-        )
-      `)
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
-    
-    if (!error && data) {
-      setCampaigns(data)
-      setFilteredCampaigns(data)
-    }
-    setLoading(false)
-  }
-
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     if (!searchQuery.trim()) {
       setFilteredCampaigns(campaigns)
       setActiveSearch('')
       return
     }
-
     const query = searchQuery.toLowerCase()
-    const filtered = campaigns.filter(campaign => {
-      const matchTitle = campaign.title.toLowerCase().includes(query)
-      const matchDescription = campaign.description.toLowerCase().includes(query)
-      const matchRecipient = campaign.recipient_name.toLowerCase().includes(query)
-      
-      return matchTitle || matchDescription || matchRecipient
-    })
-
+    const filtered = campaigns.filter(c =>
+      c.title.toLowerCase().includes(query) ||
+      c.description.toLowerCase().includes(query) ||
+      c.recipient_name.toLowerCase().includes(query)
+    )
     setFilteredCampaigns(filtered)
     setActiveSearch(searchQuery)
-  }
+  }, [searchQuery, campaigns])
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch()
-    }
-  }
+  const handleKeyPress = useCallback((e) => {
+    if (e.key === 'Enter') handleSearch()
+  }, [handleSearch])
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     setSearchQuery('')
     setActiveSearch('')
     setFilteredCampaigns(campaigns)
-  }
+  }, [campaigns])
 
-  const getSuggestions = () => {
-    const shuffled = [...campaigns].sort(() => 0.5 - Math.random())
-    return shuffled.slice(0, 3)
-  }
+  const getSuggestions = useCallback(() => {
+    return [...campaigns].sort(() => 0.5 - Math.random()).slice(0, 3)
+  }, [campaigns])
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <main className="flex-1">
-        <div 
+        <div
           className="relative py-12 md:py-16 bg-cover bg-center"
-          style={{
-            backgroundImage: 'url(/sheep-hero.jpg)',
-          }}
+          style={{ backgroundImage: 'url(/sheep-hero.jpg)' }}
         >
-          <div 
-            className="absolute inset-0" 
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
-          ></div>
-          
+          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }} />
+
           <div className="relative max-w-7xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8">
               Cuando el rebaño actúa, las cosas cambian.
@@ -113,12 +95,12 @@ export default function Home() {
                   Buscar
                 </button>
               </div>
-              
+
               <div className="h-10 mt-3">
                 {activeSearch && (
-                  <div 
+                  <div
                     className="text-xs md:text-sm text-white px-3 md:px-4 py-2 rounded-lg text-left"
-                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+                    style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
                   >
                     {filteredCampaigns.length === 0 ? (
                       <span>No se encontraron campañas con "{activeSearch}"</span>
@@ -126,10 +108,7 @@ export default function Home() {
                       <span>
                         {filteredCampaigns.length} resultado{filteredCampaigns.length !== 1 ? 's' : ''} para "{activeSearch}"
                         {filteredCampaigns.length !== campaigns.length && (
-                          <button
-                            onClick={handleClearSearch}
-                            className="ml-2 text-teal-200 hover:underline"
-                          >
+                          <button onClick={handleClearSearch} className="ml-2 text-teal-200 hover:underline">
                             Limpiar búsqueda
                           </button>
                         )}
@@ -158,7 +137,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <NoResults 
+            <NoResults
               searchQuery={activeSearch}
               onClear={handleClearSearch}
               suggestions={activeSearch ? getSuggestions() : []}
@@ -166,7 +145,7 @@ export default function Home() {
           )}
         </div>
       </main>
-      
+
       <Footer />
     </div>
   )

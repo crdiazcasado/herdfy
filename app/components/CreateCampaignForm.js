@@ -261,7 +261,8 @@ export default function CreateCampaignForm() {
               setCaptchaError(true)
             }}
             onExpire={() => setTurnstileToken(null)}
-            options={{ theme: 'light', language: 'es' }}
+            options={{ theme: 'light', language: 'es', size: 'flexible' }}
+          style={{ width: '100%' }}
           />
           {captchaError && (
             <p className="text-sm text-red-600 mt-2">

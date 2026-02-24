@@ -1,25 +1,25 @@
-export default function CampaignCard({ campaign }) {
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('es-ES', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
-    })
-  }
+import Link from 'next/link'
 
-  const getCreatorName = () => {
-    if (campaign.users?.name) {
-      return campaign.users.name
-    }
-    if (campaign.users?.email) {
-      return campaign.users.email.split('@')[0]
-    }
-    return 'Anónimo'
-  }
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  })
+}
+
+const getCreatorName = (users) => {
+  if (users?.name) return users.name
+  if (users?.email) return users.email.split('@')[0]
+  return 'Anónimo'
+}
+
+export default function CampaignCard({ campaign }) {
+  const creatorName = getCreatorName(campaign.users)
 
   return (
-    <a 
+    <Link
       href={`/c/${campaign.slug}`}
       className="flex flex-col bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow h-[370px]"
     >
@@ -52,13 +52,11 @@ export default function CampaignCard({ campaign }) {
 
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
           <div className="w-6 h-6 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-xs font-medium">
-            {getCreatorName()[0].toUpperCase()}
+            {creatorName[0].toUpperCase()}
           </div>
-          <span className="text-xs text-gray-500">
-            Por {getCreatorName()}
-          </span>
+          <span className="text-xs text-gray-500">Por {creatorName}</span>
         </div>
       </div>
-    </a>
+    </Link>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
@@ -22,14 +22,10 @@ export default function CreateCampaignButton({ mobile = false, onClose }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (onClose) onClose()
-    if (user) {
-      router.push('/dashboard/nueva')
-    } else {
-      router.push('/login')
-    }
-  }
+    router.push(user ? '/dashboard/nueva' : '/login')
+  }, [user, onClose, router])
 
   if (mobile) {
     return (

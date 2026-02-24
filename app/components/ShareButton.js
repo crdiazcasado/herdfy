@@ -1,13 +1,13 @@
 'use client'
 
+import { useCallback } from 'react'
+
 export default function ShareButton({ campaign }) {
-  const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/c/${campaign.slug}`
-  const message = `¡Únete a esta campaña! ${campaign.title} - ${shareUrl}`
-  
-  const handleShare = () => {
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, '_blank')
-  }
+  const handleShare = useCallback(() => {
+    const shareUrl = `${window.location.origin}/c/${campaign.slug}`
+    const message = `¡Únete a esta campaña! ${campaign.title} - ${shareUrl}`
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank')
+  }, [campaign.slug, campaign.title])
 
   return (
     <button
