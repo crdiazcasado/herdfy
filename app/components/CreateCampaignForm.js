@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { Turnstile } from '@marsidev/react-turnstile'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 import Modal from './Modal'
@@ -11,6 +12,9 @@ export default function CreateCampaignForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'success' })
+  const [turnstileToken, setTurnstileToken] = useState(null)
+  const [captchaError, setCaptchaError] = useState(false)
+  const turnstileRef = useRef(null)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -54,11 +58,43 @@ export default function CreateCampaignForm() {
     return fieldsToCheck.some(field => containsProfanity(field))
   }
 
+  const verifyTurnstile = async (token) => {
+    try {
+      const res = await fetch('/api/verify-turnstile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      })
+      const data = await res.json()
+      return data.success
+    } catch {
+      return false
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setCaptchaError(false)
 
+    // Verificar captcha
+    if (!turnstileToken) {
+      setCaptchaError(true)
+      setLoading(false)
+      return
+    }
+
+    const validCaptcha = await verifyTurnstile(turnstileToken)
+    if (!validCaptcha) {
+      setCaptchaError(true)
+      turnstileRef.current?.reset()
+      setTurnstileToken(null)
+      setLoading(false)
+      return
+    }
+
+    // Validación de palabras malsonantes
     if (validateContent()) {
       showModal(
         'Contenido no permitido',
@@ -182,8 +218,6 @@ export default function CreateCampaignForm() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Cuerpo del mensaje *</label>
-
-              {/* Variables destacadas */}
               <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-900">
                 <p className="font-medium mb-2">📌 Usa estas variables donde quieras insertar los datos del participante:</p>
                 <div className="flex flex-wrap gap-2">
@@ -197,7 +231,6 @@ export default function CreateCampaignForm() {
                   Ejemplo: <em>"D./Dª (NOMBRE), con DNI (DNI), vecino/a de (LOCALIDAD)..."</em>
                 </p>
               </div>
-
               <textarea rows="12" name="email_template" value={formData.email_template} onChange={handleChange} required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
                 placeholder="D./Dª (NOMBRE), con DNI (DNI), vecino/a de (LOCALIDAD)..." />
@@ -211,6 +244,30 @@ export default function CreateCampaignForm() {
               </label>
             </div>
           </div>
+        </div>
+
+        {/* Turnstile CAPTCHA */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm font-medium text-gray-700 mb-3">Verificación de seguridad *</p>
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+            onSuccess={(token) => {
+              setTurnstileToken(token)
+              setCaptchaError(false)
+            }}
+            onError={() => {
+              setTurnstileToken(null)
+              setCaptchaError(true)
+            }}
+            onExpire={() => setTurnstileToken(null)}
+            options={{ theme: 'light', language: 'es' }}
+          />
+          {captchaError && (
+            <p className="text-sm text-red-600 mt-2">
+              Por favor, completa la verificación de seguridad.
+            </p>
+          )}
         </div>
 
         <div className="flex gap-4">

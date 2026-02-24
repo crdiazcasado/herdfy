@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { Turnstile } from '@marsidev/react-turnstile'
 import Modal from './Modal'
 
 export default function ParticipationForm({ campaign }) {
@@ -14,6 +15,9 @@ export default function ParticipationForm({ campaign }) {
   const [copied, setCopied] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [thankYouModal, setThankYouModal] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState(null)
+  const [captchaError, setCaptchaError] = useState(false)
+  const turnstileRef = useRef(null)
 
   useEffect(() => {
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
@@ -27,15 +31,12 @@ export default function ParticipationForm({ campaign }) {
 
   const updateMessage = (field, value) => {
     let updatedMessage = campaign.email_template
-
     const nombre = field === 'nombre' ? value : formData.nombre
     const dni = field === 'dni' ? value : formData.dni
     const localidad = field === 'localidad' ? value : formData.localidad
-
     if (nombre) updatedMessage = updatedMessage.replace(/\(NOMBRE\)/g, nombre)
     if (dni) updatedMessage = updatedMessage.replace(/\(DNI\)/g, dni)
     if (localidad) updatedMessage = updatedMessage.replace(/\(LOCALIDAD\)/g, localidad)
-
     setMessage(updatedMessage)
   }
 
@@ -51,6 +52,20 @@ export default function ParticipationForm({ campaign }) {
     return finalMessage
   }
 
+  const verifyTurnstile = async (token) => {
+    try {
+      const res = await fetch('/api/verify-turnstile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      })
+      const data = await res.json()
+      return data.success
+    } catch {
+      return false
+    }
+  }
+
   const incrementParticipation = async () => {
     try {
       await fetch('/api/campaigns/participate', {
@@ -63,24 +78,31 @@ export default function ParticipationForm({ campaign }) {
     }
   }
 
-  // Abre el cliente de email y cuenta +1 (solo móvil)
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setCaptchaError(false)
+
+    if (!turnstileToken) {
+      setCaptchaError(true)
+      return
+    }
+
+    const valid = await verifyTurnstile(turnstileToken)
+    if (!valid) {
+      setCaptchaError(true)
+      turnstileRef.current?.reset()
+      setTurnstileToken(null)
+      return
+    }
 
     const finalMessage = getFinalMessage()
     const subject = encodeURIComponent(campaign.email_subject)
     const body = encodeURIComponent(finalMessage)
     const mailtoUrl = `mailto:${campaign.recipient_email}?subject=${subject}&body=${body}`
 
-    // Contar participación solo al abrir el email
     await incrementParticipation()
 
-    // Mostrar modal de agradecimiento tras pequeño delay
-    // (el mailto abre el cliente externo, la página queda abierta)
-    setTimeout(() => {
-      setThankYouModal(true)
-    }, 800)
-
+    setTimeout(() => setThankYouModal(true), 800)
     window.location.href = mailtoUrl
   }
 
@@ -106,7 +128,6 @@ export default function ParticipationForm({ campaign }) {
     })
   }
 
-  // Solo copia el mensaje, sin contar participación
   const handleCopyMessage = async (e) => {
     e.preventDefault()
     const finalMessage = getFinalMessage()
@@ -121,7 +142,6 @@ export default function ParticipationForm({ campaign }) {
 
   return (
     <div className="rounded-lg">
-      {/* Modal de agradecimiento */}
       <Modal
         isOpen={thankYouModal}
         onClose={() => setThankYouModal(false)}
@@ -135,7 +155,6 @@ export default function ParticipationForm({ campaign }) {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Nombre */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Nombre completo *
@@ -151,7 +170,6 @@ export default function ParticipationForm({ campaign }) {
           />
         </div>
 
-        {/* DNI */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             DNI *
@@ -167,7 +185,6 @@ export default function ParticipationForm({ campaign }) {
           />
         </div>
 
-        {/* Localidad */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Localidad *
@@ -183,7 +200,6 @@ export default function ParticipationForm({ campaign }) {
           />
         </div>
 
-        {/* Mensaje */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Mensaje {campaign.allow_edit && '(puedes editarlo)'}
@@ -199,7 +215,31 @@ export default function ParticipationForm({ campaign }) {
           />
         </div>
 
-        {/* Botones — en móvil: primero "Enviar", luego "Copiar" */}
+        {/* Turnstile CAPTCHA */}
+        <div>
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+            onSuccess={(token) => {
+              setTurnstileToken(token)
+              setCaptchaError(false)
+            }}
+            onError={() => {
+              setTurnstileToken(null)
+              setCaptchaError(true)
+            }}
+            onExpire={() => {
+              setTurnstileToken(null)
+            }}
+            options={{ theme: 'light', language: 'es' }}
+          />
+          {captchaError && (
+            <p className="text-sm text-red-600 mt-1">
+              Por favor, completa la verificación de seguridad.
+            </p>
+          )}
+        </div>
+
         <div className="space-y-3">
           {isMobile && (
             <button
@@ -219,7 +259,6 @@ export default function ParticipationForm({ campaign }) {
           </button>
         </div>
 
-        {/* Instrucciones */}
         <div className="text-sm text-gray-500 text-center">
           {isMobile ? (
             <p>
