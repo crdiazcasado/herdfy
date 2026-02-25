@@ -3,12 +3,24 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
-import { getAvatarColor } from '../../lib/avatarColor'
+
+const AVATAR_COLORS = {
+  violet: 'bg-violet-200 text-violet-700',
+  blue:   'bg-blue-200 text-blue-700',
+  green:  'bg-green-200 text-green-700',
+  yellow: 'bg-yellow-200 text-yellow-700',
+  orange: 'bg-orange-200 text-orange-700',
+  pink:   'bg-pink-200 text-pink-700',
+  teal:   'bg-teal-200 text-teal-700',
+  red:    'bg-red-200 text-red-700',
+}
 
 export default function UserMenu({ mobile = false, onClose }) {
   const [user, setUser] = useState(null)
   const [userName, setUserName] = useState('')
+  const [avatarColor, setAvatarColor] = useState('violet')
   const [showMenu, setShowMenu] = useState(false)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
@@ -16,9 +28,15 @@ export default function UserMenu({ mobile = false, onClose }) {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
       if (user) {
-        const { data } = await supabase.from('users').select('name').eq('id', user.id).single()
+        const { data } = await supabase
+          .from('users')
+          .select('name, avatar_color')
+          .eq('id', user.id)
+          .single()
         if (data?.name) setUserName(data.name)
+        if (data?.avatar_color) setAvatarColor(data.avatar_color)
       }
+      setLoading(false)
     }
     getUser()
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -36,6 +54,11 @@ export default function UserMenu({ mobile = false, onClose }) {
   }, [onClose, router])
 
   const handleCloseMenu = useCallback(() => setShowMenu(false), [])
+
+  // --- CARGANDO ---
+  if (loading) {
+    return <div className="w-24 h-8 bg-gray-100 rounded-lg animate-pulse" />
+  }
 
   // --- NO LOGUEADO ---
   if (!user) {
@@ -62,7 +85,7 @@ export default function UserMenu({ mobile = false, onClose }) {
   }
 
   const displayName = userName || user.email?.split('@')[0] || 'U'
-  const avatarColor = getAvatarColor(displayName)
+  const avatarClass = AVATAR_COLORS[avatarColor] || AVATAR_COLORS.violet
 
   // --- MOBILE LOGUEADO ---
   if (mobile) {
@@ -103,7 +126,7 @@ export default function UserMenu({ mobile = false, onClose }) {
         onClick={() => setShowMenu(!showMenu)}
         className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
       >
-        <div className={`w-8 h-8 ${avatarColor.bg} ${avatarColor.text} rounded-full flex items-center justify-center font-medium`}>
+        <div className={`w-8 h-8 ${avatarClass} rounded-full flex items-center justify-center font-medium`}>
           {displayName[0].toUpperCase()}
         </div>
         <span className="text-gray-700 hidden md:block">
@@ -124,20 +147,20 @@ export default function UserMenu({ mobile = false, onClose }) {
               className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
               onClick={handleCloseMenu}
             >
-              📊 Mis campañas
+              Mis campañas
             </Link>
             <Link
               href="/perfil"
               className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
               onClick={handleCloseMenu}
             >
-              👤 Mi perfil
+              Mi perfil
             </Link>
             <button
               onClick={handleLogout}
               className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100"
             >
-              🚪 Cerrar sesión
+              Cerrar sesión
             </button>
           </div>
         </div>

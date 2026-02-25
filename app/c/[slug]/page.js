@@ -4,11 +4,22 @@ import ParticipationForm from '../../components/ParticipationForm'
 import ShareButton from '../../components/ShareButton'
 import CampaignDetailClient from '../../components/CampaignDetailClient'
 import ReportButton from '../../components/ReportButton'
+import ScrollHint from '../../components/ScrollHint'
 import { supabase } from '../../../lib/supabase'
 import { notFound } from 'next/navigation'
-import ScrollHint from '../../components/ScrollHint'
 
 export const revalidate = 180
+
+const AVATAR_COLORS = {
+  violet: 'bg-violet-200 text-violet-700',
+  blue:   'bg-blue-200 text-blue-700',
+  green:  'bg-green-200 text-green-700',
+  yellow: 'bg-yellow-200 text-yellow-700',
+  orange: 'bg-orange-200 text-orange-700',
+  pink:   'bg-pink-200 text-pink-700',
+  teal:   'bg-teal-200 text-teal-700',
+  red:    'bg-red-200 text-red-700',
+}
 
 async function getCampaign(slug) {
   const { data, error } = await supabase
@@ -17,7 +28,8 @@ async function getCampaign(slug) {
       *,
       users (
         name,
-        email
+        email,
+        avatar_color
       )
     `)
     .eq('slug', slug)
@@ -47,16 +59,18 @@ export default async function CampaignDetail({ params }) {
     return 'Anónimo'
   }
 
+  const avatarClass = AVATAR_COLORS[campaign.users?.avatar_color] || AVATAR_COLORS.violet
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
 
-          <div className="flex flex-col md:flex-row md:gap-5 items-start">
+          <div className="flex flex-col md:flex-row gap-8 items-start">
 
             {/* Columna izquierda — 1/3 */}
-            <div className="w-full md:w-1/3 space-y-4 mb-6">
+            <div className="w-full md:w-1/3 space-y-4 md:sticky md:top-24 md:self-start">
 
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
 
@@ -76,7 +90,7 @@ export default async function CampaignDetail({ params }) {
 
                   {/* Creador */}
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0">
+                    <div className={`w-7 h-7 ${avatarClass} rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0`}>
                       {getCreatorName()[0].toUpperCase()}
                     </div>
                     <span className="text-sm text-gray-500">
@@ -87,14 +101,13 @@ export default async function CampaignDetail({ params }) {
                   {/* Estadísticas */}
                   <div className="flex flex-col gap-2 text-sm text-gray-600">
                     <span>📅 Hasta el {formatDate(campaign.deadline)}</span>
-                    {/* Solo muestra el contador si hay participaciones */}
                     {campaign.participation_count > 0 && (
                       <span>⚡ <strong className="text-gray-900">{campaign.participation_count}</strong> participaciones</span>
                     )}
                   </div>
 
                   {/* Destinatario */}
-                  <div className="">
+                  <div className="border-t border-gray-100 pt-4">
                     <CampaignDetailClient
                       recipientName={campaign.recipient_name}
                       recipientEmail={campaign.recipient_email}
@@ -103,13 +116,13 @@ export default async function CampaignDetail({ params }) {
                   </div>
                 </div>
               </div>
-             
+
             </div>
 
             {/* Columna derecha — 2/3 */}
             <div className="w-full md:w-2/3 space-y-6">
 
-              <div className="bg-white p-5 rounded-xl border border-gray-200">
+              <div className="bg-white p-6 rounded-xl border border-primary">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">
                   ¿Por qué es importante?
                 </h2>
@@ -141,7 +154,7 @@ export default async function CampaignDetail({ params }) {
           </div>
 
         </div>
- <ScrollHint />
+        <ScrollHint />
       </main>
       <Footer />
     </div>

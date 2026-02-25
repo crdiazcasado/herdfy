@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 import Modal from './Modal'
-import { containsProfanity } from '../../lib/profanityFilter'
+import { findProfanity } from '../../lib/profanityFilter'
 import ImageUpload from './ImageUpload'
 
 export default function EditCampaignForm({ campaign }) {
@@ -48,7 +48,8 @@ export default function EditCampaignForm({ campaign }) {
       formData.email_subject,
       formData.recipient_name
     ]
-    return fieldsToCheck.some(field => containsProfanity(field))
+    const found = fieldsToCheck.flatMap(field => findProfanity(field))
+    return [...new Set(found)]
   }
 
   const handleSubmit = async (e) => {
@@ -56,10 +57,11 @@ export default function EditCampaignForm({ campaign }) {
     setLoading(true)
     setError(null)
 
-    if (validateContent()) {
+    const profanityFound = validateContent()
+    if (profanityFound.length > 0) {
       showModal(
         'Contenido no permitido',
-        'El texto contiene palabras no permitidas. Por favor, revisa los campos y vuelve a intentarlo.',
+        `El texto contiene palabras no permitidas: "${profanityFound.join('", "')}". Por favor, revisa los campos y vuelve a intentarlo.`,
         'error'
       )
       setLoading(false)
@@ -101,7 +103,6 @@ export default function EditCampaignForm({ campaign }) {
   const handleDelete = async () => {
     setDeleting(true)
     setError(null)
-
     try {
       const { error: deleteError } = await supabase
         .from('campaigns')
@@ -112,7 +113,6 @@ export default function EditCampaignForm({ campaign }) {
 
       router.push('/dashboard')
       router.refresh()
-
     } catch (err) {
       setError(err.message)
       setDeleting(false)
@@ -132,72 +132,39 @@ export default function EditCampaignForm({ campaign }) {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-            {error}
-          </div>
+          <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>
         )}
 
         {/* Información básica */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Información básica</h2>
-
           <div className="space-y-4">
-
-            {/* Imagen de portada */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Imagen de portada</label>
               <ImageUpload
                 currentImageUrl={formData.image_url}
-                onImageUploaded={(url) =>
-                  setFormData(prev => ({ ...prev, image_url: url }))
-                }
+                onImageUploaded={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+              <input type="text" name="title" value={formData.title} onChange={handleChange} required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Descripción *</label>
-              <textarea
-                rows="6"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+              <textarea rows="6" name="description" value={formData.description} onChange={handleChange} required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Fecha límite *</label>
-              <input
-                type="date"
-                name="deadline"
-                value={formData.deadline}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+              <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
+              <select name="status" value={formData.status} onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                 <option value="draft">Borrador</option>
                 <option value="active">Activa</option>
                 <option value="closed">Cerrada</option>
@@ -209,30 +176,16 @@ export default function EditCampaignForm({ campaign }) {
         {/* Destinatario */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Destinatario</h2>
-
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del organismo *</label>
-              <input
-                type="text"
-                name="recipient_name"
-                value={formData.recipient_name}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+              <input type="text" name="recipient_name" value={formData.recipient_name} onChange={handleChange} required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email de destino *</label>
-              <input
-                type="email"
-                name="recipient_email"
-                value={formData.recipient_email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+              <input type="email" name="recipient_email" value={formData.recipient_email} onChange={handleChange} required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
             </div>
           </div>
         </div>
@@ -240,53 +193,30 @@ export default function EditCampaignForm({ campaign }) {
         {/* Plantilla */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Plantilla del mensaje</h2>
-
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Asunto del email *</label>
-              <input
-                type="text"
-                name="email_subject"
-                value={formData.email_subject}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+              <input type="text" name="email_subject" value={formData.email_subject} onChange={handleChange} required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Cuerpo del mensaje *</label>
-
               <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-900">
                 <p className="font-medium mb-2">📌 Variables disponibles para personalizar el mensaje:</p>
                 <div className="flex flex-wrap gap-2">
-                  {['(NOMBRE)', '(DNI)', '(LOCALIDAD)'].map(v => (
+                  {['(NOMBRE)', '(DNI)', '(LOCALIDAD)', '(FECHA)'].map(v => (
                     <span key={v} className="inline-flex items-center px-2.5 py-1 rounded-md bg-amber-200 text-amber-900 font-mono font-semibold text-xs border border-amber-400">
                       {v}
                     </span>
                   ))}
                 </div>
               </div>
-
-              <textarea
-                rows="12"
-                name="email_template"
-                value={formData.email_template}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
-              />
+              <textarea rows="12" name="email_template" value={formData.email_template} onChange={handleChange} required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm" />
             </div>
-
             <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="allow_edit"
-                name="allow_edit"
-                checked={formData.allow_edit}
-                onChange={handleChange}
-                className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
-              />
+              <input type="checkbox" id="allow_edit" name="allow_edit" checked={formData.allow_edit} onChange={handleChange}
+                className="w-4 h-4 text-primary border-gray-300 rounded outline-none focus:ring-primary" />
               <label htmlFor="allow_edit" className="ml-2 text-sm text-gray-700">
                 Permitir que los participantes editen el mensaje
               </label>
@@ -295,63 +225,40 @@ export default function EditCampaignForm({ campaign }) {
         </div>
 
         {/* Acciones */}
-        <div className="space-y-3">
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium disabled:opacity-50"
-            >
-              {loading ? 'Guardando...' : 'Guardar cambios'}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push('/dashboard')}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowDeleteConfirm(true)}
-              className="flex-1 px-6 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium border border-red-200"
-            >
-              🗑️ Eliminar campaña
-            </button>
-          </div>
+        <div className="flex gap-4">
+          <button type="submit" disabled={loading}
+            className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium disabled:opacity-50">
+            {loading ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+          <button type="button" onClick={() => router.push('/dashboard')}
+            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+            Cancelar
+          </button>
+          <button type="button" onClick={() => setShowDeleteConfirm(true)}
+            className="flex-1 px-6 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium border border-red-200">
+            🗑️ Eliminar campaña
+          </button>
         </div>
       </form>
 
-      {/* Modal de confirmación para eliminar */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black bg-opacity-50"
-            onClick={() => setShowDeleteConfirm(false)}
-          />
+          <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setShowDeleteConfirm(false)} />
           <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 z-10">
             <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">🗑️</span>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">
-              ¿Eliminar campaña?
-            </h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">¿Eliminar campaña?</h3>
             <p className="text-gray-600 mb-6 text-center">
               Esta acción no se puede deshacer. La campaña y todas sus participaciones se eliminarán permanentemente.
             </p>
             <div className="flex gap-3">
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 font-medium"
-              >
+              <button onClick={handleDelete} disabled={deleting}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 font-medium">
                 {deleting ? 'Eliminando...' : 'Sí, eliminar'}
               </button>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={deleting}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-              >
+              <button onClick={() => setShowDeleteConfirm(false)} disabled={deleting}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
                 Cancelar
               </button>
             </div>

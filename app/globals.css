@@ -40,3 +40,7 @@ input::placeholder,
 textarea::placeholder {
   color: #9CA3AF;
 }
+
+html, body {
+  overscroll-behavior: none;
+}

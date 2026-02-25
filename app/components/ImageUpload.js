@@ -92,7 +92,7 @@ export default function ImageUpload({ currentImageUrl, onImageUploaded, error = 
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        className="hidden"
+        className="hidden outline-none"
         onChange={handleFileChange}
       />
     </div>

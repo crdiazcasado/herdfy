@@ -1,43 +1,9 @@
 'use client'
-
 import { useState } from 'react'
 import ReportModal from './ReportModal'
 
 export default function CampaignDetailClient({ recipientName, recipientEmail, campaign }) {
-  const [copiedRecipient, setCopiedRecipient] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
-
-  const copyToClipboard = (text) => {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text)
-    }
-    return new Promise((resolve, reject) => {
-      const textarea = document.createElement('textarea')
-      textarea.value = text
-      textarea.style.position = 'fixed'
-      textarea.style.opacity = '0'
-      document.body.appendChild(textarea)
-      textarea.select()
-      try {
-        const successful = document.execCommand('copy')
-        document.body.removeChild(textarea)
-        successful ? resolve() : reject(new Error('Copy failed'))
-      } catch (err) {
-        document.body.removeChild(textarea)
-        reject(err)
-      }
-    })
-  }
-
-  const handleCopyRecipient = async () => {
-    try {
-      await copyToClipboard(recipientEmail)
-      setCopiedRecipient(true)
-      setTimeout(() => setCopiedRecipient(false), 3000)
-    } catch (err) {
-      console.log('Portapapeles no disponible')
-    }
-  }
 
   return (
     <>
@@ -46,24 +12,11 @@ export default function CampaignDetailClient({ recipientName, recipientEmail, ca
         onClose={() => setReportOpen(false)}
         campaign={campaign}
       />
-
-      {/* Caja destinatario */}
+      {/* Caja destinatario — sin botón copiar */}
       <div className="bg-gray-100 p-4 rounded-lg">
-        <h2 className="text-xl font-semibold text-gray-900 mb-3">
-          Destinatario
-        </h2>
-
+        <h2 className="text-xl font-semibold text-gray-900 mb-3">Destinatario</h2>
         <p className="text-gray-700 font-medium">{recipientName}</p>
-
-        <div className="items-center gap-2 mt-2">
-          <p className="text-gray-600 text-sm flex-1">{recipientEmail}</p>
-          <button
-            onClick={handleCopyRecipient}
-            className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-xs text-gray-600 whitespace-nowrap mt-2"
-          >
-            {copiedRecipient ? '✅ Copiado' : '📋 Copiar email'}
-          </button>
-        </div>
+        <p className="text-gray-600 text-sm mt-1">{recipientEmail}</p>
       </div>
     </>
   )
