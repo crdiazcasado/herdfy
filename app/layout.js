@@ -1,9 +1,10 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PHProvider } from './providers'
+import CookieBanner from './components/CookieBanner'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
 });
 
@@ -19,12 +20,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="es">
+      <body className={`${fraunces.variable} ${geistMono.variable} antialiased`}>
         <PHProvider>
-        {children}
+          {children}
+          <CookieBanner />
         </PHProvider>
       </body>
     </html>

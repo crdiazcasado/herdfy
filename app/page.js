@@ -74,18 +74,21 @@ export default function Home() {
           <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }} />
 
           <div className="relative max-w-7xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-8">
-              Cuando el rebaño actúa, las cosas cambian.
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-2">
+              Tu participación lo cambia todo.
             </h1>
+            <p className="text-lg md:text-2xl text-white mb-8">
+              Únete a miles de personas y haz que las cosas cambien.
+            </p>
 
             <div className="max-w-2xl mx-auto">
-              <div className="flex flex-col md:flex-row gap-2 bg-white p-2 md:p-3 rounded-xl shadow-lg">
+              <div className="flex flex-col md:flex-row gap-3 bg-white p-2 md:p-3 rounded-xl shadow-lg">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Buscar campañas..."
+                  placeholder="Buscar campañas, usuarios..."
                   className="flex-1 px-4 md:px-6 py-3 md:py-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base md:text-lg"
                 />
                 <button
@@ -122,16 +125,13 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
-            Campañas activas
-          </h2>
 
           {loading ? (
             <div className="text-center py-12">
               <p className="text-gray-500">Cargando campañas...</p>
             </div>
           ) : filteredCampaigns.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5">
               {filteredCampaigns.map((campaign) => (
                 <CampaignCard key={campaign.id} campaign={campaign} />
               ))}

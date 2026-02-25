@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 import Modal from './Modal'
 import { containsProfanity } from '../../lib/profanityFilter'
+import ImageUpload from './ImageUpload'
 
 export default function EditCampaignForm({ campaign }) {
   const router = useRouter()
@@ -23,7 +24,8 @@ export default function EditCampaignForm({ campaign }) {
     email_subject: campaign.email_subject,
     email_template: campaign.email_template,
     allow_edit: campaign.allow_edit,
-    status: campaign.status
+    status: campaign.status,
+    image_url: campaign.image_url || ''
   })
 
   const showModal = (title, message, type = 'success') => {
@@ -76,7 +78,8 @@ export default function EditCampaignForm({ campaign }) {
           email_subject: formData.email_subject,
           email_template: formData.email_template,
           allow_edit: formData.allow_edit,
-          status: formData.status
+          status: formData.status,
+          image_url: formData.image_url
         })
         .eq('id', campaign.id)
 
@@ -107,7 +110,6 @@ export default function EditCampaignForm({ campaign }) {
 
       if (deleteError) throw deleteError
 
-      // Redirigir directamente, sin alert
       router.push('/dashboard')
       router.refresh()
 
@@ -140,6 +142,18 @@ export default function EditCampaignForm({ campaign }) {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Información básica</h2>
 
           <div className="space-y-4">
+
+            {/* Imagen de portada */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Imagen de portada</label>
+              <ImageUpload
+                currentImageUrl={formData.image_url}
+                onImageUploaded={(url) =>
+                  setFormData(prev => ({ ...prev, image_url: url }))
+                }
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
               <input
@@ -243,7 +257,6 @@ export default function EditCampaignForm({ campaign }) {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Cuerpo del mensaje *</label>
 
-              {/* Variables destacadas */}
               <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-900">
                 <p className="font-medium mb-2">📌 Variables disponibles para personalizar el mensaje:</p>
                 <div className="flex flex-wrap gap-2">

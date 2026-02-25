@@ -168,7 +168,7 @@ export default function AuthForm() {
                   setTurnstileToken(token)
                   setCaptchaError(false)
                 }}
-                onError={() => {
+                onError={() => {n
                   setTurnstileToken(null)
                   setCaptchaError(true)
                 }}

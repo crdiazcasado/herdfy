@@ -6,11 +6,13 @@ import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 import Modal from './Modal'
 import { containsProfanity } from '../../lib/profanityFilter'
+import ImageUpload from './ImageUpload'
 
 export default function CreateCampaignForm() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [imageError, setImageError] = useState(false)
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'success' })
   const [turnstileToken, setTurnstileToken] = useState(null)
   const [captchaError, setCaptchaError] = useState(false)
@@ -24,7 +26,8 @@ export default function CreateCampaignForm() {
     recipient_email: '',
     email_subject: '',
     email_template: '',
-    allow_edit: true
+    allow_edit: true,
+    image_url: ''
   })
 
   const showModal = (title, message, type = 'success') => {
@@ -77,6 +80,15 @@ export default function CreateCampaignForm() {
     setLoading(true)
     setError(null)
     setCaptchaError(false)
+    setImageError(false)
+
+    // Validar imagen obligatoria
+    if (!formData.image_url) {
+      setImageError(true)
+      setLoading(false)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
 
     // Verificar captcha
     if (!turnstileToken) {
@@ -129,6 +141,7 @@ export default function CreateCampaignForm() {
           email_subject: formData.email_subject,
           email_template: formData.email_template,
           allow_edit: formData.allow_edit,
+          image_url: formData.image_url,
           status: 'active'
         }])
         .select()
@@ -166,6 +179,21 @@ export default function CreateCampaignForm() {
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Información básica</h2>
           <div className="space-y-4">
+
+            {/* Imagen de portada */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Imagen de portada *
+              </label>
+              <ImageUpload
+                error={imageError}
+                onImageUploaded={(url) => {
+                  setFormData(prev => ({ ...prev, image_url: url }))
+                  setImageError(false)
+                }}
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Título de la campaña *</label>
               <input type="text" name="title" value={formData.title} onChange={handleChange} required
@@ -262,7 +290,7 @@ export default function CreateCampaignForm() {
             }}
             onExpire={() => setTurnstileToken(null)}
             options={{ theme: 'light', language: 'es', size: 'flexible' }}
-          style={{ width: '100%' }}
+            style={{ width: '100%' }}
           />
           {captchaError && (
             <p className="text-sm text-red-600 mt-2">
