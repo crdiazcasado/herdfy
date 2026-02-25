@@ -11,6 +11,7 @@ export default function AuthForm() {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [isLogin, setIsLogin] = useState(true)
+  const [isForgotPassword, setIsForgotPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'success' })
@@ -33,6 +34,32 @@ export default function AuthForm() {
     }
   }
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      })
+      if (error) throw error
+
+      setModal({
+        isOpen: true,
+        title: 'Email enviado',
+        message: 'Revisa tu bandeja de entrada. Te hemos enviado un enlace para restablecer tu contraseña.',
+        type: 'success'
+      })
+      setIsForgotPassword(false)
+      setEmail('')
+    } catch (error) {
+      setError(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleAuth = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -41,13 +68,11 @@ export default function AuthForm() {
 
     try {
       if (isLogin) {
-        // Login: sin captcha
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
         router.push('/dashboard')
 
       } else {
-        // Registro: verificar captcha primero
         if (!turnstileToken) {
           setCaptchaError(true)
           setLoading(false)
@@ -92,6 +117,64 @@ export default function AuthForm() {
     }
   }
 
+  // Vista recuperar contraseña
+  if (isForgotPassword) {
+    return (
+      <>
+        <Modal
+          isOpen={modal.isOpen}
+          onClose={() => setModal(prev => ({ ...prev, isOpen: false }))}
+          title={modal.title}
+          message={modal.message}
+          type={modal.type}
+        />
+        <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Recuperar contraseña</h1>
+          <p className="text-gray-600 mb-8">
+            Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.
+          </p>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                placeholder="tu@email.com"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium disabled:opacity-50"
+            >
+              {loading ? 'Enviando...' : 'Enviar enlace'}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => { setIsForgotPassword(false); setError(null) }}
+              className="text-sm text-gray-600"
+            >
+              ← <span className="text-primary hover:underline font-medium">Volver al inicio de sesión</span>
+            </button>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  // Vista login / registro
   return (
     <>
       <Modal
@@ -146,7 +229,18 @@ export default function AuthForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+              {isLogin && (
+                <button
+                  type="button"
+                  onClick={() => { setIsForgotPassword(true); setError(null) }}
+                  className="text-xs text-primary hover:underline"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              )}
+            </div>
             <input
               type="password"
               value={password}
@@ -158,7 +252,6 @@ export default function AuthForm() {
             />
           </div>
 
-          {/* Turnstile solo en registro */}
           {!isLogin && (
             <div>
               <Turnstile
@@ -168,7 +261,7 @@ export default function AuthForm() {
                   setTurnstileToken(token)
                   setCaptchaError(false)
                 }}
-                onError={() => {n
+                onError={() => {
                   setTurnstileToken(null)
                   setCaptchaError(true)
                 }}
@@ -189,9 +282,7 @@ export default function AuthForm() {
             disabled={loading}
             className="w-full px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading
-              ? 'Cargando...'
-              : isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
+            {loading ? 'Cargando...' : isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
           </button>
         </form>
 

@@ -6,8 +6,9 @@ import CampaignDetailClient from '../../components/CampaignDetailClient'
 import ReportButton from '../../components/ReportButton'
 import { supabase } from '../../../lib/supabase'
 import { notFound } from 'next/navigation'
+import ScrollHint from '../../components/ScrollHint'
 
-export const revalidate = 90
+export const revalidate = 180
 
 async function getCampaign(slug) {
   const { data, error } = await supabase
@@ -52,19 +53,20 @@ export default async function CampaignDetail({ params }) {
       <main className="flex-1 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
 
-          <div className="flex flex-col md:flex-row gap-8 items-start">
+          <div className="flex flex-col md:flex-row md:gap-5 items-start">
 
             {/* Columna izquierda — 1/3 */}
-            <div className="w-full md:w-1/3 space-y-4">
+            <div className="w-full md:w-1/3 space-y-4 mb-6">
 
-              {/* Caja info con imagen integrada */}
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
 
-                {/* Imagen de portada dentro de la caja */}
                 <img
                   src={campaign.image_url || '/sheep-hero.jpg'}
                   alt={campaign.title}
                   className="w-full h-52 object-cover"
+                  loading="eager"
+                  width={600}
+                  height={208}
                 />
 
                 <div className="p-5 space-y-4">
@@ -85,11 +87,14 @@ export default async function CampaignDetail({ params }) {
                   {/* Estadísticas */}
                   <div className="flex flex-col gap-2 text-sm text-gray-600">
                     <span>📅 Hasta el {formatDate(campaign.deadline)}</span>
-                    <span>⚡ <strong className="text-gray-900">{campaign.participation_count}</strong> participaciones</span>
+                    {/* Solo muestra el contador si hay participaciones */}
+                    {campaign.participation_count > 0 && (
+                      <span>⚡ <strong className="text-gray-900">{campaign.participation_count}</strong> participaciones</span>
+                    )}
                   </div>
 
                   {/* Destinatario */}
-                  <div className="border-t border-gray-100 pt-4">
+                  <div className="">
                     <CampaignDetailClient
                       recipientName={campaign.recipient_name}
                       recipientEmail={campaign.recipient_email}
@@ -98,14 +103,13 @@ export default async function CampaignDetail({ params }) {
                   </div>
                 </div>
               </div>
-
+             
             </div>
 
             {/* Columna derecha — 2/3 */}
             <div className="w-full md:w-2/3 space-y-6">
 
-              {/* Descripción */}
-              <div className="bg-white p-6 rounded-xl border border-primary">
+              <div className="bg-white p-5 rounded-xl border border-gray-200">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">
                   ¿Por qué es importante?
                 </h2>
@@ -114,13 +118,11 @@ export default async function CampaignDetail({ params }) {
                 </p>
               </div>
 
-              {/* Participación */}
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="p-6">
                   <ParticipationForm campaign={campaign} />
                 </div>
 
-                {/* Compartir */}
                 <div className="px-6 pb-4">
                   <div className="border-t border-gray-200 pt-4">
                     <p className="text-sm text-gray-500 mb-3 font-medium">
@@ -130,7 +132,6 @@ export default async function CampaignDetail({ params }) {
                   </div>
                 </div>
 
-                {/* Denunciar */}
                 <div className="px-6 pb-6">
                   <ReportButton campaign={campaign} />
                 </div>
@@ -140,6 +141,7 @@ export default async function CampaignDetail({ params }) {
           </div>
 
         </div>
+ <ScrollHint />
       </main>
       <Footer />
     </div>

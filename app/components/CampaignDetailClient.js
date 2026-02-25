@@ -48,18 +48,18 @@ export default function CampaignDetailClient({ recipientName, recipientEmail, ca
       />
 
       {/* Caja destinatario */}
-      <div className="bg-white p-6 rounded-lg border border-gray-300">
+      <div className="bg-gray-100 p-4 rounded-lg">
         <h2 className="text-xl font-semibold text-gray-900 mb-3">
-          📧 Destinatario
+          Destinatario
         </h2>
 
         <p className="text-gray-700 font-medium">{recipientName}</p>
 
-        <div className="flex items-center gap-2 mt-2">
+        <div className="items-center gap-2 mt-2">
           <p className="text-gray-600 text-sm flex-1">{recipientEmail}</p>
           <button
             onClick={handleCopyRecipient}
-            className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-xs text-gray-600 whitespace-nowrap"
+            className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-xs text-gray-600 whitespace-nowrap mt-2"
           >
             {copiedRecipient ? '✅ Copiado' : '📋 Copiar email'}
           </button>

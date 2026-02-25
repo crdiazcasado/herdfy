@@ -150,7 +150,7 @@ export default function ParticipationForm({ campaign }) {
         type="success"
       />
 
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">
+      <h2 className="text-2xl font-bold text-primary mb-4">
         ✍️ Participa ahora
       </h2>
 

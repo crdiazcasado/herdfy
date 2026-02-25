@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getAvatarColor } from '../../lib/avatarColor'
 
 const formatDate = (dateString) => {
   const date = new Date(dateString)
@@ -17,6 +18,7 @@ const getCreatorName = (users) => {
 
 export default function CampaignCard({ campaign }) {
   const creatorName = getCreatorName(campaign.users)
+  const avatarColor = getAvatarColor(creatorName)
 
   return (
     <Link
@@ -28,6 +30,10 @@ export default function CampaignCard({ campaign }) {
           <img
             src={campaign.image_url || '/sheep-hero.jpg'}
             className="w-full h-30 object-cover rounded-md mb-4"
+            loading="lazy"
+            width={400}
+            height={120}
+            alt={campaign.title}
           />
         </div>
         <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
@@ -36,7 +42,6 @@ export default function CampaignCard({ campaign }) {
         <p className="text-gray-600 text-sm line-clamp-3">
           {campaign.description}
         </p>
-       
       </div>
 
       <div className="pt-3 border-t border-gray-100">
@@ -47,17 +52,20 @@ export default function CampaignCard({ campaign }) {
           </div>
         </div>
 
-       <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-xs font-medium">
+            <div className={`w-6 h-6 ${avatarColor.bg} ${avatarColor.text} rounded-full flex items-center justify-center text-xs font-medium`}>
               {creatorName[0].toUpperCase()}
             </div>
             <span className="text-xs text-gray-500">Por {creatorName}</span>
           </div>
-          <div className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-1 text-sm font-semibold">
-            <span>⚡</span>
-            <span className="text-primary">{campaign.participation_count}</span>
-          </div>
+
+          {campaign.participation_count > 0 && (
+            <div className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-1 text-sm font-semibold">
+              <span>⚡</span>
+              <span className="text-primary">{campaign.participation_count}</span>
+            </div>
+          )}
         </div>
       </div>
     </Link>

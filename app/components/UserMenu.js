@@ -1,12 +1,13 @@
 'use client'
-
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
+import { getAvatarColor } from '../../lib/avatarColor'
 
 export default function UserMenu({ mobile = false, onClose }) {
   const [user, setUser] = useState(null)
+  const [userName, setUserName] = useState('')
   const [showMenu, setShowMenu] = useState(false)
   const router = useRouter()
 
@@ -14,13 +15,15 @@ export default function UserMenu({ mobile = false, onClose }) {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
+      if (user) {
+        const { data } = await supabase.from('users').select('name').eq('id', user.id).single()
+        if (data?.name) setUserName(data.name)
+      }
     }
     getUser()
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
     })
-
     return () => subscription.unsubscribe()
   }, [])
 
@@ -58,6 +61,9 @@ export default function UserMenu({ mobile = false, onClose }) {
     )
   }
 
+  const displayName = userName || user.email?.split('@')[0] || 'U'
+  const avatarColor = getAvatarColor(displayName)
+
   // --- MOBILE LOGUEADO ---
   if (mobile) {
     return (
@@ -72,6 +78,13 @@ export default function UserMenu({ mobile = false, onClose }) {
           onClick={onClose}
         >
           📊 Mis campañas
+        </Link>
+        <Link
+          href="/perfil"
+          className="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-primary rounded-lg transition-colors font-medium"
+          onClick={onClose}
+        >
+          👤 Mi perfil
         </Link>
         <button
           onClick={handleLogout}
@@ -90,11 +103,11 @@ export default function UserMenu({ mobile = false, onClose }) {
         onClick={() => setShowMenu(!showMenu)}
         className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
       >
-        <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-medium">
-          {user.email?.[0]?.toUpperCase() || 'U'}
+        <div className={`w-8 h-8 ${avatarColor.bg} ${avatarColor.text} rounded-full flex items-center justify-center font-medium`}>
+          {displayName[0].toUpperCase()}
         </div>
         <span className="text-gray-700 hidden md:block">
-          {user.email?.split('@')[0]}
+          {displayName}
         </span>
       </button>
 
@@ -112,6 +125,13 @@ export default function UserMenu({ mobile = false, onClose }) {
               onClick={handleCloseMenu}
             >
               📊 Mis campañas
+            </Link>
+            <Link
+              href="/perfil"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+              onClick={handleCloseMenu}
+            >
+              👤 Mi perfil
             </Link>
             <button
               onClick={handleLogout}
