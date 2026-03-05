@@ -251,7 +251,7 @@ export default function CreateCampaignForm() {
                 </p>
               </div>
               <textarea rows="12" name="email_template" value={formData.email_template} onChange={handleChange} required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
                 placeholder="D./Dª (NOMBRE), con DNI (DNI), vecino/a de (LOCALIDAD)..." />
             </div>
             <div className="flex items-center">
