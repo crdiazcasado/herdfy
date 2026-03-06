@@ -4,7 +4,17 @@ import { useState, useEffect, useRef } from 'react'
 import { Turnstile } from '@marsidev/react-turnstile'
 import Modal from './Modal'
 
+function getUsedFields(template) {
+  return {
+    nombre:    /\(NOMBRE\)/.test(template),
+    dni:       /\(DNI\)/.test(template),
+    localidad: /\(LOCALIDAD\)/.test(template),
+    fecha:     /\(FECHA\)/.test(template),
+  }
+}
+
 export default function ParticipationForm({ campaign }) {
+  const used = getUsedFields(campaign.email_template)
   const [formData, setFormData] = useState({
     nombre: '',
     dni: '',
@@ -12,7 +22,6 @@ export default function ParticipationForm({ campaign }) {
     fecha: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }),
     asunto: campaign.email_subject
   })
-
   const [message, setMessage] = useState(campaign.email_template)
   const [copied, setCopied] = useState(false)
   const [copiedRecipient, setCopiedRecipient] = useState(false)
@@ -25,27 +34,26 @@ export default function ParticipationForm({ campaign }) {
 
   useEffect(() => {
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
-    const today = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
-    setMessage(prev => prev.replace(/\(FECHA\)/g, today))
+    if (used.fecha) {
+      const today = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+      setMessage(prev => prev.replace(/\(FECHA\)/g, today))
+    }
   }, [])
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    updateMessage(name, value)
+    const updated = { ...formData, [name]: value }
+    setFormData(updated)
+    updateMessage(updated)
   }
 
-  const updateMessage = (field, value) => {
-    let updatedMessage = campaign.email_template
-    const nombre = field === 'nombre' ? value : formData.nombre
-    const dni = field === 'dni' ? value : formData.dni
-    const localidad = field === 'localidad' ? value : formData.localidad
-    const fecha = formData.fecha
-    if (nombre) updatedMessage = updatedMessage.replace(/\(NOMBRE\)/g, nombre)
-    if (dni) updatedMessage = updatedMessage.replace(/\(DNI\)/g, dni)
-    if (localidad) updatedMessage = updatedMessage.replace(/\(LOCALIDAD\)/g, localidad)
-    updatedMessage = updatedMessage.replace(/\(FECHA\)/g, fecha)
-    setMessage(updatedMessage)
+  const updateMessage = (data) => {
+    let updated = campaign.email_template
+    if (used.nombre    && data.nombre)    updated = updated.replace(/\(NOMBRE\)/g, data.nombre)
+    if (used.dni       && data.dni)       updated = updated.replace(/\(DNI\)/g, data.dni)
+    if (used.localidad && data.localidad) updated = updated.replace(/\(LOCALIDAD\)/g, data.localidad)
+    if (used.fecha     && data.fecha)     updated = updated.replace(/\(FECHA\)/g, data.fecha)
+    setMessage(updated)
   }
 
   const handleMessageChange = (e) => {
@@ -53,33 +61,28 @@ export default function ParticipationForm({ campaign }) {
   }
 
   const getFinalMessage = () => {
-    let finalMessage = message
-    finalMessage = finalMessage.replace(/\(NOMBRE\)/g, formData.nombre)
-    finalMessage = finalMessage.replace(/\(DNI\)/g, formData.dni)
-    finalMessage = finalMessage.replace(/\(LOCALIDAD\)/g, formData.localidad)
-    finalMessage = finalMessage.replace(/\(FECHA\)/g, formData.fecha)
-    return finalMessage
+    let final = message
+    if (used.nombre)    final = final.replace(/\(NOMBRE\)/g, formData.nombre)
+    if (used.dni)       final = final.replace(/\(DNI\)/g, formData.dni)
+    if (used.localidad) final = final.replace(/\(LOCALIDAD\)/g, formData.localidad)
+    if (used.fecha)     final = final.replace(/\(FECHA\)/g, formData.fecha)
+    return final
   }
 
   const copyToClipboard = (text) => {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text)
-    }
+    if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text)
     return new Promise((resolve, reject) => {
-      const textarea = document.createElement('textarea')
-      textarea.value = text
-      textarea.style.position = 'fixed'
-      textarea.style.opacity = '0'
-      document.body.appendChild(textarea)
-      textarea.select()
+      const ta = document.createElement('textarea')
+      ta.value = text
+      ta.style.position = 'fixed'
+      ta.style.opacity = '0'
+      document.body.appendChild(ta)
+      ta.select()
       try {
-        const successful = document.execCommand('copy')
-        document.body.removeChild(textarea)
-        successful ? resolve() : reject(new Error('Copy failed'))
-      } catch (err) {
-        document.body.removeChild(textarea)
-        reject(err)
-      }
+        const ok = document.execCommand('copy')
+        document.body.removeChild(ta)
+        ok ? resolve() : reject()
+      } catch (err) { document.body.removeChild(ta); reject(err) }
     })
   }
 
@@ -92,9 +95,7 @@ export default function ParticipationForm({ campaign }) {
       })
       const data = await res.json()
       return data.success
-    } catch {
-      return false
-    }
+    } catch { return false }
   }
 
   const incrementParticipation = async () => {
@@ -104,17 +105,13 @@ export default function ParticipationForm({ campaign }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug: campaign.slug }),
       })
-    } catch (error) {
-      console.error('Error incrementando participación:', error)
-    }
+    } catch (err) { console.error('Error incrementando participación:', err) }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setCaptchaError(false)
-
     if (!turnstileToken) { setCaptchaError(true); return }
-
     const valid = await verifyTurnstile(turnstileToken)
     if (!valid) {
       setCaptchaError(true)
@@ -122,15 +119,11 @@ export default function ParticipationForm({ campaign }) {
       setTurnstileToken(null)
       return
     }
-
-    const finalMessage = getFinalMessage()
     const subject = encodeURIComponent(formData.asunto)
-    const body = encodeURIComponent(finalMessage)
-    const mailtoUrl = `mailto:${campaign.recipient_email}?subject=${subject}&body=${body}`
-
+    const body = encodeURIComponent(getFinalMessage())
     await incrementParticipation()
     setTimeout(() => setThankYouModal(true), 800)
-    window.location.href = mailtoUrl
+    window.location.href = `mailto:${campaign.recipient_email}?subject=${subject}&body=${body}`
   }
 
   const handleCopyMessage = async (e) => {
@@ -158,8 +151,20 @@ export default function ParticipationForm({ campaign }) {
     } catch { console.log('Portapapeles no disponible') }
   }
 
+  const labelStyle = {
+  display: 'block', fontSize: '14px', fontWeight: 500,
+  color: '#364153', marginBottom: '6px'
+}
+  const inputStyle = {
+    width: '100%', padding: '9px 13px',
+    border: '1.5px solid #e4e1da', borderRadius: '8px',
+    fontFamily: 'DM Sans, sans-serif', fontSize: '14px',
+    color: '#1c2b22', background: '#f8f7f4', outline: 'none',
+    boxSizing: 'border-box'
+  }
+
   return (
-    <div className="rounded-lg">
+    <div>
       <Modal
         isOpen={thankYouModal}
         onClose={() => setThankYouModal(false)}
@@ -168,63 +173,65 @@ export default function ParticipationForm({ campaign }) {
         type="success"
       />
 
-      <h2 className="text-2xl font-bold text-primary mb-4">✍️ Participa ahora</h2>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-
-        {/* Asunto — input editable prerelleno */}
+        {/* Asunto */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Asunto del email</label>
-          <input
-            type="text"
-            name="asunto"
-            value={formData.asunto}
+          <label style={labelStyle}>Asunto del email</label>
+          <input type="text" name="asunto" value={formData.asunto}
             onChange={(e) => setFormData(prev => ({ ...prev, asunto: e.target.value }))}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
+            style={inputStyle} />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nombre completo *</label>
-          <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Tu nombre y apellidos" />
-        </div>
+        {/* Campos dinámicos — solo los que usa la plantilla */}
+        {(used.nombre || used.dni) && (
+          <div style={{ display: 'grid', gridTemplateColumns: used.nombre && used.dni ? '1fr 1fr' : '1fr', gap: '12px' }}>
+            {used.nombre && (
+              <div>
+                <label style={labelStyle}>Nombre completo</label>
+                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange}
+                  style={inputStyle} placeholder="Tu nombre y apellidos" />
+              </div>
+            )}
+            {used.dni && (
+              <div>
+                <label style={labelStyle}>DNI</label>
+                <input type="text" name="dni" value={formData.dni} onChange={handleChange}
+                  style={inputStyle} placeholder="12345678A" />
+              </div>
+            )}
+          </div>
+        )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">DNI *</label>
-          <input type="text" name="dni" value={formData.dni} onChange={handleChange} required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="12345678A" />
-        </div>
+        {used.localidad && (
+          <div>
+            <label style={labelStyle}>Localidad</label>
+            <input type="text" name="localidad" value={formData.localidad} onChange={handleChange}
+              style={inputStyle} placeholder="Tu ciudad o municipio" />
+          </div>
+        )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Localidad *</label>
-          <input type="text" name="localidad" value={formData.localidad} onChange={handleChange} required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Tu ciudad" />
-        </div>
+        {used.fecha && (
+          <div>
+            <label style={labelStyle}>Fecha</label>
+            <input type="text" name="fecha" value={formData.fecha}
+              onChange={(e) => {
+                const updated = { ...formData, fecha: e.target.value }
+                setFormData(updated)
+                updateMessage(updated)
+              }}
+              style={{ ...inputStyle, color: '#4d5e56' }} />
+          </div>
+        )}
 
+        {/* Mensaje */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de hoy</label>
-          <input type="text" name="fecha" value={formData.fecha}
-            onChange={(e) => {
-              setFormData(prev => ({ ...prev, fecha: e.target.value }))
-              updateMessage('fecha', e.target.value)
-            }}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50 text-gray-600"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Mensaje {campaign.allow_edit && '(puedes editarlo)'}
-          </label>
+          <label style={labelStyle}>Mensaje {campaign.allow_edit && '(puedes editarlo)'}</label>
           <textarea rows="8" value={message} onChange={handleMessageChange} readOnly={!campaign.allow_edit}
-            className={`w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${!campaign.allow_edit ? 'bg-gray-50' : ''}`}
-          />
+            style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.55, background: campaign.allow_edit ? '#f8f7f4' : '#f0f0ee' }} />
         </div>
 
+        {/* Turnstile */}
         <div>
           <Turnstile
             ref={turnstileRef}
@@ -236,50 +243,49 @@ export default function ParticipationForm({ campaign }) {
             style={{ width: '100%' }}
           />
           {captchaError && (
-            <p className="text-sm text-red-600 mt-1">Por favor, completa la verificación de seguridad.</p>
+            <p style={{ fontSize: '12px', color: '#e53e3e', marginTop: '4px' }}>
+              Por favor, completa la verificación de seguridad.
+            </p>
           )}
         </div>
 
-        {/* MOBILE */}
-        <div className="space-y-3 md:hidden">
+        {/* Botones móvil */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }} className="md:hidden">
           {isMobile && (
             <button type="submit"
-              className="w-full px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors text-lg font-medium">
+              style={{ width: '100%', padding: '12px', background: '#3a9e7a', color: 'white', border: 'none', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
               Enviar desde mi email
             </button>
           )}
           <button type="button" onClick={handleCopyMessage}
-            className="w-full px-6 py-3 border border-primary text-primary rounded-lg hover:bg-green-50 transition-colors font-medium text-lg">
+            style={{ width: '100%', padding: '11px', background: 'transparent', color: '#3a9e7a', border: '1.5px solid #3a9e7a', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
             {copied ? '¡Mensaje copiado!' : 'Copiar mensaje'}
           </button>
         </div>
 
-        {/* DESKTOP — 3 botones en fila */}
-        <div className="hidden md:flex gap-3">
+        {/* Botones desktop — 3 en fila */}
+        <div style={{ display: 'none', gap: '10px' }} className="hidden md:flex">
           <button type="button" onClick={handleCopyRecipient}
-            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm">
+            style={{ flex: 1, padding: '10px', border: '1.5px solid #e4e1da', color: '#4d5e56', borderRadius: '100px', background: 'transparent', fontFamily: 'DM Sans, sans-serif', fontWeight: 500, fontSize: '13px', cursor: 'pointer' }}>
             {copiedRecipient ? '✅ Copiado' : 'Copiar destinatario'}
           </button>
           <button type="button" onClick={handleCopySubject}
-            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm">
+            style={{ flex: 1, padding: '10px', border: '1.5px solid #e4e1da', color: '#4d5e56', borderRadius: '100px', background: 'transparent', fontFamily: 'DM Sans, sans-serif', fontWeight: 500, fontSize: '13px', cursor: 'pointer' }}>
             {copiedSubject ? '✅ Copiado' : 'Copiar asunto'}
           </button>
           <button type="button" onClick={handleCopyMessage}
-            className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium text-sm">
+            style={{ flex: 1, padding: '10px', background: '#3a9e7a', color: 'white', border: 'none', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
             {copied ? '✅ Mensaje copiado' : 'Copiar mensaje'}
           </button>
         </div>
 
-        <div className="text-sm text-gray-500 text-center">
-          {isMobile ? (
-            <p>
-              <strong>Opción 1:</strong> Pulsa "Enviar desde mi email" para abrirlo directamente.<br />
-              <strong>Opción 2:</strong> Copia el mensaje y pégalo en tu email.
-            </p>
-          ) : (
-            <p>Copia el mensaje, abre tu email y envíalo al destinatario indicado.</p>
-          )}
-        </div>
+        {/* Instrucciones */}
+        <p style={{ fontSize: '12px', color: '#94a3a0', textAlign: 'center' }}>
+          {isMobile
+            ? 'Opción 1: pulsa "Enviar desde mi email" para abrirlo directamente. Opción 2: copia el mensaje y pégalo en tu email.'
+            : 'Copia el mensaje, abre tu email y envíalo al destinatario indicado.'}
+        </p>
+
       </form>
     </div>
   )
