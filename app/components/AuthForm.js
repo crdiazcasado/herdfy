@@ -205,7 +205,7 @@ export default function AuthForm() {
           </div>
 
           {!isLogin && (
-            <div>
+            <div className="turnstile-wrapper">
               <Turnstile
                 ref={turnstileRef}
                 siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}

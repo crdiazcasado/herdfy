@@ -83,12 +83,14 @@ export default async function CampaignDetail({ params }) {
       <Navbar />
 
       <main style={{ flex: 1 }}>
-        <div style={{ maxWidth: '1152px', margin: '0 auto', padding: '32px 24px' }}>
+        <div style={{ maxWidth: '1152px', margin: '0 auto', padding: '32px 14px' }}>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', alignItems: 'flex-start' }}>
 
             {/* ── COLUMNA IZQUIERDA 1/3 ── */}
-            <div style={{ flex: '1 1 280px', maxWidth: '360px', display: 'flex', flexDirection: 'column', gap: '16px', position: 'sticky', top: '24px' }}>
+            <div
+              className="campaign-sidebar" 
+              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
               <div style={{ background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', overflow: 'hidden' }}>
 
@@ -136,7 +138,9 @@ export default async function CampaignDetail({ params }) {
             </div>
 
             {/* ── COLUMNA DERECHA 2/3 ── */}
-            <div style={{ flex: '2 1 400px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div 
+              className="campaign-main"
+              style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
               <div style={{ background: 'white', padding: '24px', borderRadius: '12px', border: '1px solid #3a9e7a' }}>
                 <h2 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '18px', fontWeight: 700, color: '#1c2b22', marginBottom: '12px' }}>

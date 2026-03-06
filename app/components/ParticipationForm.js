@@ -152,9 +152,9 @@ export default function ParticipationForm({ campaign }) {
   }
 
   const labelStyle = {
-  display: 'block', fontSize: '14px', fontWeight: 500,
-  color: '#364153', marginBottom: '6px'
-}
+    display: 'block', fontSize: '14px', fontWeight: 500,
+    color: '#364153', marginBottom: '6px'
+  }
   const inputStyle = {
     width: '100%', padding: '9px 13px',
     border: '1.5px solid #e4e1da', borderRadius: '8px',
@@ -232,7 +232,7 @@ export default function ParticipationForm({ campaign }) {
         </div>
 
         {/* Turnstile */}
-        <div>
+        <div className="turnstile-wrapper">
           <Turnstile
             ref={turnstileRef}
             siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}

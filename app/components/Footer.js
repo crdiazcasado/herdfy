@@ -21,8 +21,8 @@ export default function Footer() {
             <Link href="/aviso-legal" className="hover:text-gray-700 hover:underline">Aviso legal</Link>
           </div>
 
-          <div className="text-sm text-gray-600 text-center">
-            2026 · Hecho con ❤️ por{' '}
+          <div className="text-sm text-gray-400 text-center">
+            2026 · Hecho con ♥ por{' '}
             <a
               href="https://www.linkedin.com/in/crdiazcasado/"
               target="_blank"

@@ -90,7 +90,7 @@ export default function CreateCampaignForm() {
 
   const sectionStyle = { background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }
   const sectionTitleStyle = { fontFamily: 'Fraunces, Georgia, serif', fontSize: '17px', fontWeight: 700, color: '#1c2b22', margin: 0 }
-   const labelStyle = {display: 'block', fontSize: '14px', fontWeight: 500, color: '#364153', marginBottom: '6px'}
+  const labelStyle = { display: 'block', fontSize: '14px', fontWeight: 500, color: '#364153', marginBottom: '6px' }
   const inputStyle = { width: '100%', padding: '9px 13px', border: '1.5px solid #e4e1da', borderRadius: '8px', fontFamily: 'DM Sans, sans-serif', fontSize: '14px', color: '#1c2b22', background: '#f8f7f4', outline: 'none', boxSizing: 'border-box' }
 
   return (
@@ -169,11 +169,17 @@ export default function CreateCampaignForm() {
         {/* Turnstile */}
         <div style={{ background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', padding: '24px' }}>
           <p style={{ fontSize: '11px', fontWeight: 600, color: '#94a3a0', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Verificación de seguridad *</p>
-          <Turnstile ref={turnstileRef} siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-            onSuccess={(token) => { setTurnstileToken(token); setCaptchaError(false) }}
-            onError={() => { setTurnstileToken(null); setCaptchaError(true) }}
-            onExpire={() => setTurnstileToken(null)}
-            options={{ theme: 'light', language: 'es', size: 'flexible' }} style={{ width: '100%' }} />
+          <div className="turnstile-wrapper">
+            <Turnstile
+              ref={turnstileRef}
+              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+              onSuccess={(token) => { setTurnstileToken(token); setCaptchaError(false) }}
+              onError={() => { setTurnstileToken(null); setCaptchaError(true) }}
+              onExpire={() => setTurnstileToken(null)}
+              options={{ theme: 'light', language: 'es', size: 'flexible' }}
+              style={{ width: '100%' }}
+            />
+          </div>
           {captchaError && <p style={{ fontSize: '12px', color: '#e53e3e', marginTop: '6px' }}>Por favor, completa la verificación de seguridad.</p>}
         </div>
 

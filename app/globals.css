@@ -29,6 +29,15 @@ body {
   background-color: #f3f2f1;
 }
 
+body {
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
 /* Asegurar que el texto de inputs sea visible */
 input,
 textarea,
@@ -43,4 +52,41 @@ textarea::placeholder {
 
 html, body {
   overscroll-behavior: none;
+}
+
+.campaign-sidebar {
+  position: static;
+  flex: 1 1 100% !important;
+  max-width: 100% !important;
+}
+
+.campaign-main {
+  flex: 1 1 100% !important;
+}
+
+@media (min-width: 768px) {
+  .campaign-sidebar {
+    position: sticky;
+    top: 24px;
+    flex: 1 1 280px !important;
+    max-width: 360px !important;
+  }
+
+  .campaign-main {
+    flex: 2 1 400px !important;
+  }
+}
+
+.turnstile-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  .turnstile-wrapper > div {
+    transform: scale(0.82);
+    transform-origin: left center;
+    width: 122% !important;
+    height: 70px;
+  }
 }
