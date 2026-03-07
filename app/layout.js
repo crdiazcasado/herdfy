@@ -18,7 +18,9 @@ export const metadata = {
   description: "Plataforma de creación de campañas sociales.",
   icons: {
     icon: '/icon.png',
-    apple: '/apple-touch-icon.png',
+    apple: [
+    { url: "/apple-touch-icon.png", sizes: "180x180"  }
+  ]
   },
 }
 
