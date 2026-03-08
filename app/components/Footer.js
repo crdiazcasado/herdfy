@@ -9,7 +9,7 @@ export default function Footer() {
           <div className="flex items-center gap-2 text-center md:text-left">
             <div>
               <div className="font-bold text-gray-900">Herdfy</div>
-              <div className="text-sm text-gray-600">¡Todos a una!</div>
+              <div className="text-sm text-gray-600">¡Todxs a una!</div>
             </div>
           </div>
 
