@@ -13,16 +13,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "Herdfy - Cuando el rebaño actúa, las cosas cambian.",
-  description: "Plataforma de creación de campañas sociales.",
-  icons: {
-    icon: '/icon.png',
-    apple: [
-    { url: "/apple-touch-icon.png", sizes: "180x180"  }
-  ]
-  },
-}
+
 
 export default function RootLayout({ children }) {
   return (
