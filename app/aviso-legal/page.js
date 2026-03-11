@@ -1,5 +1,3 @@
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 
 export const metadata = {
   title: 'Aviso legal | Herdfy',
@@ -9,7 +7,6 @@ export const metadata = {
 export default function AvisoLegal() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-1 bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 py-12">
           <div className="bg-white rounded-xl border border-gray-200 p-8 space-y-8">
@@ -82,7 +79,6 @@ export default function AvisoLegal() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   )
 }

@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 
 
 export default function ResetPassword() {
@@ -43,7 +41,6 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-1 bg-gray-50">
         <div className="max-w-md mx-auto px-4 py-16">
           <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
@@ -99,7 +96,6 @@ export default function ResetPassword() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   )
 }

@@ -90,3 +90,9 @@ html, body {
     height: 70px;
   }
 }
+
+@media (max-width: 767px) {
+  .mobile-textarea {
+    min-height: 320px !important;
+  }
+}

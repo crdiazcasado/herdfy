@@ -13,8 +13,17 @@ function getUsedFields(template) {
   }
 }
 
+function isCampaignExpired(campaign) {
+  if (campaign.status !== 'active') return true
+  if (!campaign.deadline) return false
+  const today = new Date().toISOString().split('T')[0]
+  return campaign.deadline < today
+}
+
 export default function ParticipationForm({ campaign }) {
+  const expired = isCampaignExpired(campaign)
   const used = getUsedFields(campaign.email_template)
+
   const [formData, setFormData] = useState({
     nombre: '',
     dni: '',
@@ -163,6 +172,23 @@ export default function ParticipationForm({ campaign }) {
     boxSizing: 'border-box'
   }
 
+  // ── CAMPAÑA VENCIDA / INACTIVA ──
+  if (expired) {
+    return (
+      <div>
+        <label style={labelStyle}>Mensaje de la campaña</label>
+        <textarea
+          rows={8}
+          value={campaign.email_template}
+          readOnly
+          className="mobile-textarea"
+          style={{ ...inputStyle, resize: 'none', lineHeight: 1.55, background: '#f0f0ee', color: '#94a3a0', cursor: 'default' }}
+        />
+      </div>
+    )
+  }
+
+  // ── CAMPAÑA ACTIVA ──
   return (
     <div>
       <Modal
@@ -175,7 +201,6 @@ export default function ParticipationForm({ campaign }) {
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-        {/* Asunto */}
         <div>
           <label style={labelStyle}>Asunto del email</label>
           <input type="text" name="asunto" value={formData.asunto}
@@ -183,23 +208,19 @@ export default function ParticipationForm({ campaign }) {
             style={inputStyle} />
         </div>
 
-        {/* Campos dinámicos — solo los que usa la plantilla */}
-        {(used.nombre || used.dni) && (
-          <div style={{ display: 'grid', gridTemplateColumns: used.nombre && used.dni ? '1fr 1fr' : '1fr', gap: '12px' }}>
-            {used.nombre && (
-              <div>
-                <label style={labelStyle}>Nombre completo</label>
-                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange}
-                  style={inputStyle} placeholder="Tu nombre y apellidos" />
-              </div>
-            )}
-            {used.dni && (
-              <div>
-                <label style={labelStyle}>DNI</label>
-                <input type="text" name="dni" value={formData.dni} onChange={handleChange}
-                  style={inputStyle} placeholder="12345678A" />
-              </div>
-            )}
+        {used.nombre && (
+          <div>
+            <label style={labelStyle}>Nombre completo</label>
+            <input type="text" name="nombre" value={formData.nombre} onChange={handleChange}
+              style={inputStyle} placeholder="Tu nombre y apellidos" />
+          </div>
+        )}
+
+        {used.dni && (
+          <div>
+            <label style={labelStyle}>DNI</label>
+            <input type="text" name="dni" value={formData.dni} onChange={handleChange}
+              style={inputStyle} placeholder="12345678A" />
           </div>
         )}
 
@@ -224,14 +245,18 @@ export default function ParticipationForm({ campaign }) {
           </div>
         )}
 
-        {/* Mensaje */}
         <div>
           <label style={labelStyle}>Mensaje {campaign.allow_edit && '(puedes editarlo)'}</label>
-          <textarea rows="8" value={message} onChange={handleMessageChange} readOnly={!campaign.allow_edit}
-            style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.55, background: campaign.allow_edit ? '#f8f7f4' : '#f0f0ee' }} />
+          <textarea
+            rows={8}
+            value={message}
+            onChange={handleMessageChange}
+            readOnly={!campaign.allow_edit}
+            className="mobile-textarea"
+            style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.55, background: campaign.allow_edit ? '#f8f7f4' : '#f0f0ee' }}
+          />
         </div>
 
-        {/* Turnstile */}
         <div className="turnstile-wrapper">
           <Turnstile
             ref={turnstileRef}
@@ -263,7 +288,7 @@ export default function ParticipationForm({ campaign }) {
           </button>
         </div>
 
-        {/* Botones desktop — 3 en fila */}
+        {/* Botones desktop */}
         <div style={{ display: 'none', gap: '10px' }} className="hidden md:flex">
           <button type="button" onClick={handleCopyRecipient}
             style={{ flex: 1, padding: '10px', border: '1.5px solid #e4e1da', color: '#4d5e56', borderRadius: '100px', background: 'transparent', fontFamily: 'DM Sans, sans-serif', fontWeight: 500, fontSize: '13px', cursor: 'pointer' }}>
@@ -279,7 +304,6 @@ export default function ParticipationForm({ campaign }) {
           </button>
         </div>
 
-        {/* Instrucciones */}
         <p style={{ fontSize: '12px', color: '#94a3a0', textAlign: 'center' }}>
           {isMobile
             ? 'Opción 1: pulsa "Enviar desde mi email" para abrirlo directamente. Opción 2: copia el mensaje y pégalo en tu email.'

@@ -31,7 +31,7 @@ export default function CreateCampaignButton({ mobile = false, onClose }) {
     return (
       <button
         onClick={handleClick}
-        className="w-full px-4 py-3 bg-primary text-white text-center rounded-lg hover:bg-primary-hover transition-colors font-medium"
+        className="w-full px-4 py-3 bg-primary text-white text-center rounded-full hover:bg-primary-hover transition-colors font-medium"
       >
         Crear campaña
       </button>
@@ -41,7 +41,7 @@ export default function CreateCampaignButton({ mobile = false, onClose }) {
   return (
     <button
       onClick={handleClick}
-      className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium"
+      className="px-6 py-2 bg-primary text-white rounded-full hover:bg-primary-hover transition-colors font-medium"
     >
       Crear campaña
     </button>

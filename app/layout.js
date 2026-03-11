@@ -2,6 +2,8 @@ import { Fraunces, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PHProvider } from './providers'
 import CookieBanner from './components/CookieBanner'
+import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -13,14 +15,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-
-
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body className={`${fraunces.variable} ${geistMono.variable} antialiased`}>
         <PHProvider>
+          <Navbar />
           {children}
+          <Footer />
           <CookieBanner />
         </PHProvider>
       </body>

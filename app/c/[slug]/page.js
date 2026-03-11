@@ -1,11 +1,10 @@
-import Navbar from '../../components/Navbar'
-import Footer from '../../components/Footer'
 import ParticipationForm from '../../components/ParticipationForm'
 import ShareButton from '../../components/ShareButton'
 import CampaignDetailClient from '../../components/CampaignDetailClient'
 import ReportButton from '../../components/ReportButton'
 import ScrollHint from '../../components/ScrollHint'
-import { supabase } from '../../../lib/supabase'
+import CampaignCreatorAlert from '../../components/CampaignCreatorAlert'
+import { supabaseServer as supabase } from '../../../lib/supabaseServer'
 import { notFound } from 'next/navigation'
 
 export const revalidate = 180
@@ -45,8 +44,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: campaign.title,
       description: campaign.description?.slice(0, 160),
-      url,
-      type: 'website',
+      url, type: 'website',
       images: [{ url: image, width: 1200, height: 630, alt: campaign.title }],
     },
     twitter: {
@@ -74,41 +72,30 @@ export default async function CampaignDetail({ params }) {
     return 'Anónimo'
   }
 
+  const today = new Date().toISOString().split('T')[0]
+  const isExpired = campaign.status !== 'active' || (campaign.deadline && campaign.deadline < today)
+  const count = campaign.participation_count || 0
+
   const avatarColor = campaign.users?.avatar_color || 'violet'
   const avatarBg = AVATAR_BG[avatarColor] || AVATAR_BG.violet
   const avatarText = AVATAR_COLORS[avatarColor] || AVATAR_COLORS.violet
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f8f7f4' }}>
-      <Navbar />
-
       <main style={{ flex: 1 }}>
         <div style={{ maxWidth: '1152px', margin: '0 auto', padding: '32px 14px' }}>
-
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', alignItems: 'flex-start' }}>
 
             {/* ── COLUMNA IZQUIERDA 1/3 ── */}
-            <div
-              className="campaign-sidebar" 
-              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
+            <div className="campaign-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', overflow: 'hidden' }}>
-
-                <img
-                  src={campaign.image_url || '/sheep-hero.jpg'}
-                  alt={campaign.title}
+                <img src={campaign.image_url || '/sheep-hero.jpg'} alt={campaign.title}
                   style={{ width: '100%', height: '208px', objectFit: 'cover', display: 'block' }}
-                  loading="eager"
-                  width={600}
-                  height={208}
-                />
-
+                  loading="eager" width={600} height={208} />
                 <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
                   <h1 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '20px', fontWeight: 700, color: '#1c2b22', lineHeight: 1.3, margin: 0 }}>
                     {campaign.title}
                   </h1>
-
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{ width: '28px', height: '28px', background: avatarBg, color: avatarText, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, flexShrink: 0 }}>
                       {getCreatorName()[0].toUpperCase()}
@@ -117,14 +104,12 @@ export default async function CampaignDetail({ params }) {
                       Por <span style={{ fontWeight: 600, color: '#4d5e56' }}>{getCreatorName()}</span>
                     </span>
                   </div>
-
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', color: '#4d5e56' }}>
                     <span>📅 Hasta el {formatDate(campaign.deadline)}</span>
                     {campaign.participation_count > 0 && (
                       <span>⚡ <strong style={{ color: '#1c2b22' }}>{campaign.participation_count}</strong> participaciones</span>
                     )}
                   </div>
-
                   <div style={{ borderTop: '1px solid #e4e1da', paddingTop: '16px' }}>
                     <CampaignDetailClient
                       recipientName={campaign.recipient_name}
@@ -134,13 +119,30 @@ export default async function CampaignDetail({ params }) {
                   </div>
                 </div>
               </div>
-
             </div>
 
             {/* ── COLUMNA DERECHA 2/3 ── */}
-            <div 
-              className="campaign-main"
-              style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="campaign-main" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+              {/* Alert inactiva — solo para el creador (client component) */}
+              <CampaignCreatorAlert campaign={campaign} />
+
+              {/* Banner campaña cerrada — para todos */}
+              {isExpired && (
+                <div style={{ background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', padding: '24px', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                  <div style={{ fontSize: '32px', flexShrink: 0, lineHeight: 1 }}>🎉</div>
+                  <div>
+                    <p style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '17px', fontWeight: 700, color: '#1c2b22', marginBottom: '6px', lineHeight: 1.3 }}>
+                      {count > 0
+                        ? `¡${count} ${count === 1 ? 'persona ha' : 'personas han'} participado en esta campaña!`
+                        : '¡Gracias a todos los que participaron!'}
+                    </p>
+                    <p style={{ fontSize: '14px', color: '#4d5e56', lineHeight: 1.6, margin: 0 }}>
+                      El plazo de participación ya ha cerrado. Cada mensaje enviado ha contribuido a hacer llegar esta causa a quien tiene que escucharla.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div style={{ background: 'white', padding: '24px', borderRadius: '12px', border: '1px solid #3a9e7a' }}>
                 <h2 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '18px', fontWeight: 700, color: '#1c2b22', marginBottom: '12px' }}>
@@ -155,7 +157,6 @@ export default async function CampaignDetail({ params }) {
                 <div style={{ padding: '24px' }}>
                   <ParticipationForm campaign={campaign} />
                 </div>
-
                 <div style={{ padding: '0 24px 16px' }}>
                   <div style={{ borderTop: '1px solid #e4e1da', paddingTop: '16px' }}>
                     <p style={{ fontSize: '13px', color: '#94a3a0', marginBottom: '10px', fontWeight: 500 }}>
@@ -164,7 +165,6 @@ export default async function CampaignDetail({ params }) {
                     <ShareButton campaign={campaign} />
                   </div>
                 </div>
-
                 <div style={{ padding: '0 24px 24px' }}>
                   <ReportButton campaign={campaign} />
                 </div>
@@ -172,12 +172,9 @@ export default async function CampaignDetail({ params }) {
 
             </div>
           </div>
-
         </div>
         <ScrollHint />
       </main>
-
-      <Footer />
     </div>
   )
 }

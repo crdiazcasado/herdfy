@@ -5,14 +5,14 @@ import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 const AVATAR_COLORS = {
-  violet: 'bg-violet-200 text-violet-700',
-  blue:   'bg-blue-200 text-blue-700',
-  green:  'bg-green-200 text-green-700',
-  yellow: 'bg-yellow-200 text-yellow-700',
-  orange: 'bg-orange-200 text-orange-700',
-  pink:   'bg-pink-200 text-pink-700',
-  teal:   'bg-teal-200 text-teal-700',
-  red:    'bg-red-200 text-red-700',
+  violet: { bg: '#ede9fe', text: '#7c3aed' },
+  blue:   { bg: '#dbeafe', text: '#2563eb' },
+  green:  { bg: '#dcfce7', text: '#16a34a' },
+  yellow: { bg: '#fef9c3', text: '#ca8a04' },
+  orange: { bg: '#ffedd5', text: '#ea580c' },
+  pink:   { bg: '#fce7f3', text: '#db2777' },
+  teal:   { bg: '#ccfbf1', text: '#0d9488' },
+  red:    { bg: '#fee2e2', text: '#dc2626' },
 }
 
 export default function UserMenu({ mobile = false, onClose }) {
@@ -55,115 +55,102 @@ export default function UserMenu({ mobile = false, onClose }) {
 
   const handleCloseMenu = useCallback(() => setShowMenu(false), [])
 
-  // --- CARGANDO ---
   if (loading) {
-    return <div className="w-24 h-8 bg-gray-100 rounded-lg animate-pulse" />
+    return <div style={{ width: '96px', height: '32px', background: '#f0f0ee', borderRadius: '8px' }} />
   }
 
-  // --- NO LOGUEADO ---
-  if (!user) {
-    if (mobile) {
-      return (
-        <Link
-          href="/login"
-          className="block px-4 py-3 text-center border border-primary text-primary rounded-lg hover:bg-primary/5 transition-colors font-medium"
-          onClick={onClose}
-        >
-          Iniciar sesión
-        </Link>
-      )
-    }
+  const displayName = userName || user?.email?.split('@')[0] || 'U'
+  const colors = AVATAR_COLORS[avatarColor] || AVATAR_COLORS.violet
+
+  // ── NO LOGUEADO MÓVIL ──
+  if (!user && mobile) {
     return (
-      <Link
-        href="/login"
-        className="px-6 py-2 border border-primary text-primary rounded-lg hover:bg-primary/5 transition-colors font-medium"
-        onClick={onClose}
-      >
+      <Link href="/login" onClick={onClose}
+        style={{ display: 'block', padding: '14px', background: '#3a9e7a', color: 'white', borderRadius: '100px', textAlign: 'center', fontWeight: 700, fontSize: '15px', textDecoration: 'none' }}>
         Iniciar sesión
       </Link>
     )
   }
 
-  const displayName = userName || user.email?.split('@')[0] || 'U'
-  const avatarClass = AVATAR_COLORS[avatarColor] || AVATAR_COLORS.violet
+  // ── NO LOGUEADO DESKTOP ──
+  if (!user) {
+    return (
+      <Link href="/login"
+        style={{ padding: '8px 20px', border: '1.5px solid #3a9e7a', color: '#3a9e7a', borderRadius: '100px', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>
+        Iniciar sesión
+      </Link>
+    )
+  }
 
-  // --- MOBILE LOGUEADO ---
+  // ── LOGUEADO MÓVIL ──
   if (mobile) {
     return (
-      <div className="space-y-2">
-        <div className="px-4 py-2 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-500">Conectado como</p>
-          <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
+      <div>
+        {/* Bloque usuario — tarjeta con fondo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '16px', background: 'white', borderRadius: '14px', border: '1px solid #e4e1da', marginBottom: '8px' }}>
+          <div style={{ width: '48px', height: '48px', background: colors.bg, color: colors.text, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 700, flexShrink: 0 }}>
+            {displayName[0].toUpperCase()}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '17px', fontWeight: 700, color: '#1c2b22', lineHeight: 1.2 }}>
+              {displayName}
+            </div>
+            <div style={{ fontSize: '12px', color: '#94a3a0', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {user.email}
+            </div>
+          </div>
         </div>
-        <Link
-          href="/dashboard"
-          className="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-primary rounded-lg transition-colors font-medium"
-          onClick={onClose}
-        >
-          📊 Mis campañas
-        </Link>
-        <Link
-          href="/perfil"
-          className="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-primary rounded-lg transition-colors font-medium"
-          onClick={onClose}
-        >
-          👤 Mi perfil
-        </Link>
-        <button
-          onClick={handleLogout}
-          className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition-colors font-medium border-t border-gray-100"
-        >
-          🚪 Cerrar sesión
-        </button>
+
+        {/* Label sección */}
+        <p style={{ fontSize: '11px', fontWeight: 700, color: '#94a3a0', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '16px 0 8px', paddingLeft: '12px' }}>
+          Mi cuenta
+        </p>
+
+        {/* Links */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <Link href="/dashboard" onClick={onClose}
+            style={{ padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#1c2b22', textDecoration: 'none', display: 'block' }}>
+            Mis campañas
+          </Link>
+          <Link href="/perfil" onClick={onClose}
+            style={{ padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#1c2b22', textDecoration: 'none', display: 'block' }}>
+            Mi perfil
+          </Link>
+          <button onClick={handleLogout}
+            style={{ padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#e53e3e', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', width: '100%', marginTop: '4px' }}>
+            Cerrar sesión
+          </button>
+        </div>
       </div>
     )
   }
 
-  // --- DESKTOP LOGUEADO ---
+  // ── LOGUEADO DESKTOP ──
   return (
-    <div className="relative">
-      <button
-        onClick={() => setShowMenu(!showMenu)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-      >
-        <div className={`w-8 h-8 ${avatarClass} rounded-full flex items-center justify-center font-medium`}>
+    <div style={{ position: 'relative' }}>
+      <button onClick={() => setShowMenu(!showMenu)}
+        style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '8px' }}>
+        <div style={{ width: '32px', height: '32px', background: colors.bg, color: colors.text, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700 }}>
           {displayName[0].toUpperCase()}
         </div>
-        <span className="text-gray-700 hidden md:block">
-          {displayName}
-        </span>
+        <span style={{ fontSize: '14px', color: '#4d5e56', fontWeight: 500 }}>{displayName}</span>
       </button>
 
       {showMenu && (
-        <div>
-          <div className="fixed inset-0 z-10" onClick={handleCloseMenu} />
-          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <p className="text-sm text-gray-500">Conectado como</p>
-              <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
+        <>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 10 }} onClick={handleCloseMenu} />
+          <div style={{ position: 'absolute', right: 0, marginTop: '8px', width: '200px', background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)', zIndex: 20, overflow: 'hidden' }}>
+            <div style={{ padding: '14px 16px', borderBottom: '1px solid #e4e1da' }}>
+              <div style={{ fontSize: '13px', color: '#94a3a0', marginBottom: '2px' }}>Conectado como</div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#1c2b22', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
             </div>
-            <Link
-              href="/dashboard"
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-              onClick={handleCloseMenu}
-            >
-              Mis campañas
-            </Link>
-            <Link
-              href="/perfil"
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-              onClick={handleCloseMenu}
-            >
-              Mi perfil
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100"
-            >
+            <Link href="/dashboard" onClick={handleCloseMenu} style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: '#1c2b22', textDecoration: 'none' }}>Mis campañas</Link>
+            <Link href="/perfil" onClick={handleCloseMenu} style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: '#1c2b22', textDecoration: 'none' }}>Mi perfil</Link>
+            <button onClick={handleLogout} style={{ display: 'block', width: '100%', padding: '10px 16px', fontSize: '14px', color: '#e53e3e', background: 'transparent', border: 'none', borderTop: '1px solid #e4e1da', cursor: 'pointer', textAlign: 'left' }}>
               Cerrar sesión
             </button>
           </div>
-        </div>
+        </>
       )}
     </div>
   )

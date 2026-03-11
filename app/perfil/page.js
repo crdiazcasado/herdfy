@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 
 const COLORS = [
   { id: 'violet', bg: 'bg-violet-200', text: 'text-violet-700' },
@@ -110,7 +108,6 @@ export default function Perfil() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-1 bg-gray-50">
         <div className="max-w-2xl mx-auto px-4 py-12">
 
@@ -238,7 +235,6 @@ export default function Perfil() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   )
 }

@@ -8,6 +8,8 @@ import Modal from './Modal'
 import { findProfanity } from '../../lib/profanityFilter'
 import ImageUpload from './ImageUpload'
 
+const today = new Date().toISOString().split('T')[0]
+
 export default function CreateCampaignForm() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -22,7 +24,7 @@ export default function CreateCampaignForm() {
     title: '', description: '', deadline: '',
     recipient_name: '', recipient_email: '',
     email_subject: '', email_template: '',
-    allow_edit: true, image_url: ''
+    allow_edit: true, image_url: '', status: 'active'
   })
 
   const showModal = (title, message, type = 'success') => setModal({ isOpen: true, title, message, type })
@@ -78,7 +80,8 @@ export default function CreateCampaignForm() {
         recipient_name: formData.recipient_name, recipient_email: formData.recipient_email,
         deadline: formData.deadline, email_subject: formData.email_subject,
         email_template: formData.email_template, allow_edit: formData.allow_edit,
-        image_url: formData.image_url, status: 'active'
+        image_url: formData.image_url, status: formData.status,
+        inactive_since: null,
       }]).select()
 
       if (insertError) throw insertError
@@ -100,7 +103,6 @@ export default function CreateCampaignForm() {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {error && <div style={{ padding: '10px 14px', background: '#fff5f5', border: '1px solid #fed7d7', color: '#c53030', borderRadius: '8px', fontSize: '13px' }}>{error}</div>}
 
-        {/* Información básica */}
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Información básica</h2>
           <div>
@@ -117,11 +119,17 @@ export default function CreateCampaignForm() {
           </div>
           <div>
             <label style={labelStyle}>Fecha límite *</label>
-            <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required style={inputStyle} />
+            <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required min={today} style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Estado *</label>
+            <select name="status" value={formData.status} onChange={handleChange} style={inputStyle}>
+              <option value="active">Activa — visible para todo el mundo</option>
+              <option value="draft">Borrador — solo visible para ti</option>
+            </select>
           </div>
         </div>
 
-        {/* Destinatario */}
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Destinatario</h2>
           <div>
@@ -134,7 +142,6 @@ export default function CreateCampaignForm() {
           </div>
         </div>
 
-        {/* Plantilla */}
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Plantilla del mensaje</h2>
           <div>
@@ -166,7 +173,6 @@ export default function CreateCampaignForm() {
           </div>
         </div>
 
-        {/* Turnstile */}
         <div style={{ background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', padding: '24px' }}>
           <p style={{ fontSize: '11px', fontWeight: 600, color: '#94a3a0', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Verificación de seguridad *</p>
           <div className="turnstile-wrapper">
@@ -183,7 +189,6 @@ export default function CreateCampaignForm() {
           {captchaError && <p style={{ fontSize: '12px', color: '#e53e3e', marginTop: '6px' }}>Por favor, completa la verificación de seguridad.</p>}
         </div>
 
-        {/* Acciones */}
         <div style={{ display: 'flex', gap: '12px' }}>
           <button type="submit" disabled={loading}
             style={{ flex: 1, padding: '12px', background: loading ? '#94a3a0' : '#3a9e7a', color: 'white', border: 'none', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '14px', cursor: loading ? 'not-allowed' : 'pointer' }}>

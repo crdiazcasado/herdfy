@@ -7,6 +7,8 @@ import Modal from './Modal'
 import { findProfanity } from '../../lib/profanityFilter'
 import ImageUpload from './ImageUpload'
 
+const today = new Date().toISOString().split('T')[0]
+
 export default function EditCampaignForm({ campaign }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -15,12 +17,21 @@ export default function EditCampaignForm({ campaign }) {
   const [deleting, setDeleting] = useState(false)
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'success' })
 
+  // Si la fecha ha vencido y el estado es active, lo tratamos como inactive
+  const isAutoInactive = campaign.status === 'active' && campaign.deadline && campaign.deadline < today
+
   const [formData, setFormData] = useState({
-    title: campaign.title, description: campaign.description,
-    deadline: campaign.deadline, recipient_name: campaign.recipient_name,
-    recipient_email: campaign.recipient_email, email_subject: campaign.email_subject,
-    email_template: campaign.email_template, allow_edit: campaign.allow_edit,
-    status: campaign.status, image_url: campaign.image_url || ''
+    title: campaign.title,
+    description: campaign.description,
+    deadline: campaign.deadline,
+    recipient_name: campaign.recipient_name,
+    recipient_email: campaign.recipient_email,
+    email_subject: campaign.email_subject,
+    email_template: campaign.email_template,
+    allow_edit: campaign.allow_edit,
+    status: isAutoInactive ? 'inactive' : (campaign.status === 'closed' ? 'inactive' : campaign.status),
+    image_url: campaign.image_url || '',
+    inactive_since: campaign.inactive_since || null,
   })
 
   const showModal = (title, message, type = 'success') => setModal({ isOpen: true, title, message, type })
@@ -46,13 +57,27 @@ export default function EditCampaignForm({ campaign }) {
       setLoading(false); return
     }
 
+    // Gestión de inactive_since
+    let inactive_since = formData.inactive_since
+    if (formData.status === 'inactive' && !inactive_since) {
+      inactive_since = new Date().toISOString()
+    } else if (formData.status === 'active') {
+      inactive_since = null
+    }
+
     try {
       const { error: updateError } = await supabase.from('campaigns').update({
-        title: formData.title, description: formData.description,
-        recipient_name: formData.recipient_name, recipient_email: formData.recipient_email,
-        deadline: formData.deadline, email_subject: formData.email_subject,
-        email_template: formData.email_template, allow_edit: formData.allow_edit,
-        status: formData.status, image_url: formData.image_url
+        title: formData.title,
+        description: formData.description,
+        recipient_name: formData.recipient_name,
+        recipient_email: formData.recipient_email,
+        deadline: formData.deadline,
+        email_subject: formData.email_subject,
+        email_template: formData.email_template,
+        allow_edit: formData.allow_edit,
+        status: formData.status,
+        image_url: formData.image_url,
+        inactive_since,
       }).eq('id', campaign.id)
 
       if (updateError) throw updateError
@@ -73,7 +98,7 @@ export default function EditCampaignForm({ campaign }) {
 
   const sectionStyle = { background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', padding: '24px', marginBottom: '16px' }
   const sectionTitleStyle = { fontFamily: 'Fraunces, Georgia, serif', fontSize: '17px', fontWeight: 700, color: '#1c2b22', marginBottom: '18px' }
-  const labelStyle = {display: 'block', fontSize: '14px', fontWeight: 500, color: '#364153', marginBottom: '6px'}  
+  const labelStyle = { display: 'block', fontSize: '14px', fontWeight: 500, color: '#364153', marginBottom: '6px' }
   const inputStyle = { width: '100%', padding: '9px 13px', border: '1.5px solid #e4e1da', borderRadius: '8px', fontFamily: 'DM Sans, sans-serif', fontSize: '14px', color: '#1c2b22', background: '#f8f7f4', outline: 'none', boxSizing: 'border-box' }
 
   return (
@@ -83,7 +108,6 @@ export default function EditCampaignForm({ campaign }) {
       <form onSubmit={handleSubmit}>
         {error && <div style={{ padding: '10px 14px', background: '#fff5f5', border: '1px solid #fed7d7', color: '#c53030', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>{error}</div>}
 
-        {/* Información básica */}
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Información básica</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -101,20 +125,24 @@ export default function EditCampaignForm({ campaign }) {
             </div>
             <div>
               <label style={labelStyle}>Fecha límite *</label>
-              <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required style={inputStyle} />
+              <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required min={today} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Estado *</label>
               <select name="status" value={formData.status} onChange={handleChange} style={inputStyle}>
-                <option value="draft">Borrador</option>
-                <option value="active">Activa</option>
-                <option value="closed">Cerrada</option>
+                <option value="active">Activa — visible para todo el mundo</option>
+                <option value="inactive">Inactiva — solo visible para ti</option>
+                <option value="draft">Borrador — solo visible para ti</option>
               </select>
+              {isAutoInactive && formData.status === 'inactive' && (
+                <p style={{ fontSize: '12px', color: '#94a3a0', marginTop: '6px' }}>
+                  La campaña pasó a inactiva automáticamente porque venció la fecha límite.
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Destinatario */}
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Destinatario</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -129,7 +157,6 @@ export default function EditCampaignForm({ campaign }) {
           </div>
         </div>
 
-        {/* Plantilla */}
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Plantilla del mensaje</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -162,7 +189,6 @@ export default function EditCampaignForm({ campaign }) {
           </div>
         </div>
 
-        {/* Acciones */}
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button type="submit" disabled={loading}
             style={{ flex: 1, minWidth: '140px', padding: '12px', background: loading ? '#94a3a0' : '#3a9e7a', color: 'white', border: 'none', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '14px', cursor: loading ? 'not-allowed' : 'pointer' }}>
@@ -179,7 +205,6 @@ export default function EditCampaignForm({ campaign }) {
         </div>
       </form>
 
-      {/* Modal eliminar */}
       {showDeleteConfirm && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,43,34,0.45)' }} onClick={() => setShowDeleteConfirm(false)} />
