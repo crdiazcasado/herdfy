@@ -1,36 +1,6 @@
 'use client'
 import { useState } from 'react'
-
-const faqs = [
-  {
-    q: '¿Herdfy es gratuito?',
-    a: 'Sí, completamente. Tanto participar en campañas como crearlas es gratis.',
-  },
-  {
-    q: '¿Necesito registrarme para participar?',
-    a: 'No. Puedes participar en cualquier campaña sin crear cuenta.',
-  },
-  {
-    q: '¿Necesito cuenta para crear una campaña?',
-    a: 'Sí. Para crear y gestionar campañas necesitas registrarte con tu email.',
-  },
-  {
-    q: '¿Quién recibe los mensajes?',
-    a: 'El destinatario lo decide quien crea la campaña. Puede ser una administración, una empresa, un organismo público... El mensaje se genera listo para que cada participante lo envíe directamente.',
-  },
-  {
-    q: '¿Cómo sé que mi participación cuenta?',
-    a: 'Herdfy registra el número de participaciones en cada campaña, visible públicamente. Cuantas más personas participen, más peso tiene el mensaje colectivo.',
-  },
-  {
-    q: '¿Puedo eliminar mi campaña?',
-    a: 'Sí. Desde tu panel puedes pausarla, editarla o eliminarla cuando quieras.',
-  },
-  {
-    q: '¿Herdfy toma partido por alguna causa?',
-    a: 'No. Herdfy es una herramienta neutral. Cualquier persona u organización puede crear una campaña sobre cualquier causa, siempre dentro de la legalidad.',
-  },
-]
+import { useTranslations } from 'next-intl'
 
 function FaqItem({ q, a }) {
   const [open, setOpen] = useState(false)
@@ -67,21 +37,31 @@ function FaqItem({ q, a }) {
 }
 
 export default function FAQ() {
+  const t = useTranslations('faq')
+
+  const faqs = [
+    { q: t('q1'), a: t('a1') },
+    { q: t('q2'), a: t('a2') },
+    { q: t('q3'), a: t('a3') },
+    { q: t('q4'), a: t('a4') },
+    { q: t('q5'), a: t('a5') },
+    { q: t('q6'), a: t('a6') },
+    { q: t('q7'), a: t('a7') },
+  ]
+
   return (
     <main style={{ background: '#f8f7f4', minHeight: '100vh', padding: '48px 16px 80px' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
 
-        {/* Hero */}
         <div style={{ marginBottom: '40px' }}>
           <h1 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1c2b22', lineHeight: 1.2, marginBottom: '12px' }}>
-            Preguntas frecuentes
+            {t('title')}
           </h1>
           <p style={{ fontSize: '17px', color: '#4d5e56', lineHeight: 1.65 }}>
-            Todo lo que necesitas saber para participar o crear tu primera campaña.
+            {t('subtitle')}
           </p>
         </div>
 
-        {/* Acordeón */}
         <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e4e1da', padding: '0 24px' }}>
           {faqs.map((item, i) => (
             <FaqItem key={i} q={item.q} a={item.a} />

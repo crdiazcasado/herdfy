@@ -1,14 +1,15 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import CampaignCard from '@/app/components/CampaignCard'
 import NoResults from '@/app/components/NoResults'
 import { supabase } from '@/lib/supabase'
 
-const PAGE_SIZE = 12 
+const PAGE_SIZE = 12
 
 export default function Home() {
+  const t = useTranslations('home')
   const [campaigns, setCampaigns] = useState([])
   const [filteredCampaigns, setFilteredCampaigns] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -62,10 +63,6 @@ export default function Home() {
     setCurrentPage(1)
   }, [campaigns])
 
-  const getSuggestions = useCallback(() => {
-    return [...campaigns].sort(() => 0.5 - Math.random()).slice(0, 3)
-  }, [campaigns])
-
   // Paginación
   const totalPages = Math.ceil(filteredCampaigns.length / PAGE_SIZE)
   const paginatedCampaigns = filteredCampaigns.slice(
@@ -85,10 +82,10 @@ export default function Home() {
 
           <div className="relative max-w-7xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-2">
-              Tu participación lo cambia todo.
+              {t('title')}
             </h1>
             <p className="text-lg md:text-2xl text-white mb-8">
-              Únete a miles de personas y haz que las cosas cambien.
+              {t('subtitle')}
             </p>
 
             <div className="max-w-2xl mx-auto">
@@ -98,14 +95,14 @@ export default function Home() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Buscar campañas, usuarios..."
+                  placeholder={t('searchPlaceholder')}
                   className="flex-1 px-4 md:px-6 py-3 md:py-4 border-2 border-gray-300 outline-none rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base md:text-lg"
                 />
                 <button
                   onClick={handleSearch}
                   className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium text-base md:text-lg"
                 >
-                  Buscar
+                  {t('searchButton')}
                 </button>
               </div>
 
@@ -118,8 +115,8 @@ export default function Home() {
                     <span className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
                       <span className="whitespace-nowrap flex-shrink-0">
                         {filteredCampaigns.length === 0
-                          ? 'No se encontraró:'
-                          : `${filteredCampaigns.length} resultado${filteredCampaigns.length !== 1 ? 's' : ''} para`
+                          ? t('noResultsFor')
+                          : t('resultsFor', { count: filteredCampaigns.length })
                         }
                       </span>
                       <span className="truncate text-teal-100 font-medium">"{activeSearch}"</span>
@@ -128,7 +125,7 @@ export default function Home() {
                       onClick={handleClearSearch}
                       className="text-teal-200 hover:underline whitespace-nowrap flex-shrink-0"
                     >
-                      Limpiar
+                      {t('clear')}
                     </button>
                   </div>
                 )}
@@ -158,7 +155,6 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Paginación */}
               {totalPages > 1 && (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '40px' }}>
                   <button
@@ -166,7 +162,7 @@ export default function Home() {
                     disabled={currentPage === 1}
                     style={{ padding: '8px 16px', borderRadius: '100px', border: '1.5px solid #e4e1da', background: 'white', color: currentPage === 1 ? '#94a3a0' : '#1c2b22', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontSize: '14px', fontWeight: 500 }}
                   >
-                    ← Anterior
+                    {t('previous')}
                   </button>
 
                   {[...Array(totalPages)].map((_, i) => (
@@ -184,7 +180,7 @@ export default function Home() {
                     disabled={currentPage === totalPages}
                     style={{ padding: '8px 16px', borderRadius: '100px', border: '1.5px solid #e4e1da', background: 'white', color: currentPage === totalPages ? '#94a3a0' : '#1c2b22', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', fontSize: '14px', fontWeight: 500 }}
                   >
-                    Siguiente →
+                    {t('next')}
                   </button>
                 </div>
               )}

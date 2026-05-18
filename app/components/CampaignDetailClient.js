@@ -1,8 +1,10 @@
 'use client'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import ReportModal from './ReportModal'
 
 export default function CampaignDetailClient({ recipients, campaign }) {
+  const t = useTranslations('campaign')
   const [reportOpen, setReportOpen] = useState(false)
 
   return (
@@ -14,7 +16,7 @@ export default function CampaignDetailClient({ recipients, campaign }) {
       />
       <div className="bg-gray-100 p-4 rounded-lg">
         <h2 className="text-xl font-semibold text-gray-900 mb-3">
-          {recipients.length === 1 ? 'Destinatario' : 'Destinatarios'}
+          {recipients.length === 1 ? t('recipient') : t('recipients')}
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {recipients.map((r, i) => (

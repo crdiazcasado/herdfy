@@ -15,6 +15,7 @@
     "legal": "Avís legal",
     "copyright": "2026 · Herdfy"
   },
+<<<<<<< HEAD
   "dashboard": {
     "title": "Les meves campanyes",
     "newCampaign": "+ Nova campanya",
@@ -160,5 +161,95 @@
     "campaignUpdatedTitle": "Canvis desats!",
     "campaignUpdatedMessage": "La campanya s'ha actualitzat correctament.",
     "loginRequired": "Has d'iniciar sessió per crear una campanya"
+  },
+  "card": {
+    "deadline": "Fins el {date}"
+  },
+  "home": {
+    "title": "La teva participació ho canvia tot.",
+    "subtitle": "Uneix-te a milers de persones i fes que les coses canviïn.",
+    "searchPlaceholder": "Cercar campanyes, usuaris...",
+    "searchButton": "Cercar",
+    "resultsFor": "{count, plural, one {# resultat per a} other {# resultats per a}}",
+    "noResultsFor": "No s'ha trobat:",
+    "clear": "Netejar",
+    "previous": "← Anterior",
+    "next": "Següent →"
+  },
+  "campaign": {
+    "deadline": "Fins el {date}",
+    "participationsLabel": "{count, plural, one {participació} other {participacions}}",
+    "expiredWithCount": "{count, plural, one {¡# persona ha participat en aquesta campanya!} other {¡# persones han participat en aquesta campanya!}}",
+    "expiredNoCount": "Gràcies a tothom qui ha participat!",
+    "expiredDescription": "El termini de participació ja ha tancat. Cada missatge enviat ha contribuït a fer arribar aquesta causa a qui ha d'escoltar-la.",
+    "whyImportant": "Per què és important?",
+    "sharePrompt": "📣 Coneixes algú que també hauria de participar? Comparteix!",
+    "recipient": "Destinatari",
+    "recipients": "Destinataris"
+  },
+  "form": {
+    "messageLabel": "Missatge de la campanya",
+    "subjectLabel": "Assumpte del correu",
+    "nameLabel": "Nom complet",
+    "namePlaceholder": "El teu nom i cognoms",
+    "dniLabel": "DNI",
+    "localidadLabel": "Localitat",
+    "localidadPlaceholder": "La teva ciutat o municipi",
+    "fechaLabel": "Data",
+    "messageLabelEditable": "Missatge (pots editar-lo)",
+    "messageLabelReadonly": "Missatge",
+    "captchaError": "Si us plau, completa la verificació de seguretat.",
+    "sendButton": "Enviar des del meu correu",
+    "copyMessage": "Copiar missatge",
+    "messageCopied": "Missatge copiat!",
+    "messageCopiedDesktop": "✅ Missatge copiat",
+    "copyRecipient": "Copiar destinatari",
+    "copySubject": "Copiar assumpte",
+    "copied": "✅ Copiat",
+    "mobileInstructions": "Opció 1: prem \"Enviar des del meu correu\" per obrir-lo directament. Opció 2: copia el missatge i enganxa'l al teu correu.",
+    "desktopInstructions": "Copia el missatge, obre el teu correu i envia'l al destinatari indicat.",
+    "thankYouTitle": "Gràcies per participar!",
+    "thankYouMessage": "El teu missatge està llest per enviar. Recorda enviar-lo des del teu client de correu perquè la teva participació compti."
+  },
+  "howItWorks": {
+    "metaTitle": "Com funciona · Herdfy",
+    "metaDesc": "Herdfy és la plataforma on la ciutadania s'organitza per ser escoltada. Sense burocràcia, sense barreres.",
+    "title": "Herdfy és la plataforma on la ciutadania s'organitza per ser escoltada.",
+    "subtitle": "Sense burocràcia, sense barreres. Només tu, el teu missatge i les persones que pensen com tu.",
+    "participateTitle": "Si vols participar",
+    "p1Title": "Troba una campanya",
+    "p1Desc": "Cerca per tema o paraula clau. Hi ha campanyes de tot tipus: medi ambient, drets, urbanisme, animals, educació...",
+    "p2Title": "Llegeix el missatge",
+    "p2Desc": "Cada campanya inclou un text dirigit a qui ha de prendre la decisió. Pots editar-lo si vols afegir la teva pròpia veu.",
+    "p3Title": "Envia el teu suport",
+    "p3Desc": "Omple el teu nom, localitat i data. Nosaltres generem el missatge llest per copiar i enviar al destinatari.",
+    "createTitle": "Si vols crear una campanya",
+    "c1Title": "Crea el teu compte",
+    "c1Desc": "Només necessites un correu electrònic.",
+    "c2Title": "Defineix la teva campanya",
+    "c2Desc": "Posa-li títol, tria a qui va dirigida i escriu el missatge base que els participants podran personalitzar.",
+    "c3Title": "Comparteix-la",
+    "c3Desc": "Cada campanya té la seva pròpia URL. Comparteix-la per WhatsApp, xarxes o on vulguis. Herdfy fa la resta.",
+    "dataTitle": "Què passa amb les teves dades?",
+    "dataDesc": "Les dades que introdueixes en participar (nom, localitat, data) només s'utilitzen per generar el missatge. Herdfy no les emmagatzema ni les comparteix amb tercers."
+  },
+  "faq": {
+    "metaTitle": "FAQ · Herdfy",
+    "title": "Preguntes freqüents",
+    "subtitle": "Tot el que necessites saber per participar o crear la teva primera campanya.",
+    "q1": "Herdfy és gratuït?",
+    "a1": "Sí, completament. Tant participar en campanyes com crear-les és gratuït.",
+    "q2": "Necessito registrar-me per participar?",
+    "a2": "No. Pots participar en qualsevol campanya sense crear un compte.",
+    "q3": "Necessito compte per crear una campanya?",
+    "a3": "Sí. Per crear i gestionar campanyes cal registrar-se amb el teu correu electrònic.",
+    "q4": "Qui rep els missatges?",
+    "a4": "El destinatari ho decideix qui crea la campanya. Pot ser una administració, una empresa, un organisme públic... El missatge es genera llest perquè cada participant l'enviï directament.",
+    "q5": "Com sé que la meva participació compta?",
+    "a5": "Herdfy registra el nombre de participacions a cada campanya, visible públicament. Com més persones participin, més pes té el missatge col·lectiu.",
+    "q6": "Puc eliminar la meva campanya?",
+    "a6": "Sí. Des del teu tauler pots pausar-la, editar-la o eliminar-la quan vulguis.",
+    "q7": "Herdfy pren partit per alguna causa?",
+    "a7": "No. Herdfy és una eina neutral. Qualsevol persona o organització pot crear una campanya sobre qualsevol causa, sempre dins de la legalitat."
   }
 }
