@@ -189,12 +189,12 @@ export default function EditCampaignForm({ campaign }) {
                 )}
                 <div>
                   <label style={labelStyle}>Nombre del organismo *</label>
-                  <input type="text" value={recipient.name} onChange={(e) => handleRecipientChange(index, 'name', e.target.value)}
+                  <input type="text" name={`recipient_name_${index}`} value={recipient.name} onChange={(e) => handleRecipientChange(index, 'name', e.target.value)}
                     required style={{ ...inputStyle, background: 'white' }} />
                 </div>
                 <div>
                   <label style={labelStyle}>Email de destino *</label>
-                  <input type="email" value={recipient.email} onChange={(e) => handleRecipientChange(index, 'email', e.target.value)}
+                  <input type="email" name={`recipient_email_${index}`} value={recipient.email} onChange={(e) => handleRecipientChange(index, 'email', e.target.value)}
                     required style={{ ...inputStyle, background: 'white' }} />
                 </div>
               </div>
