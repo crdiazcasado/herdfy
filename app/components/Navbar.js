@@ -5,11 +5,6 @@ import { Link, useRouter, usePathname } from '@/lib/i18nNavigation'
 import UserMenu from './UserMenu'
 import CreateCampaignButton from './CreateCampaignButton'
 
-const linkStyle = {
-  color: '#4d5e56', fontSize: '14px', textDecoration: 'none',
-  fontWeight: 500, transition: 'color 0.15s',
-}
-
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [visible, setVisible] = useState(false)
@@ -17,6 +12,21 @@ export default function Navbar() {
   const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
+
+  const isActive = (href) => {
+    if (href === '/') return pathname === '/' || pathname.startsWith('/c/')
+    return pathname === href || pathname.startsWith(href + '/')
+  }
+
+  const navLinkStyle = (href) => ({
+    color: isActive(href) ? '#1c2b22' : '#4d5e56',
+    fontSize: '14px',
+    textDecoration: 'none',
+    fontWeight: isActive(href) ? 600 : 500,
+    transition: 'color 0.15s',
+    paddingBottom: '2px',
+    borderBottom: isActive(href) ? '2px solid #3a9e7a' : '2px solid transparent',
+  })
 
   const closeMobileMenu = () => {
     setVisible(false)
@@ -61,16 +71,19 @@ export default function Navbar() {
 
       <nav style={{ background: 'white', borderBottom: '1px solid #e4e1da', position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: '1152px', margin: '0 auto', padding: '0 16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '64px', position: 'relative' }}>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="/logo.png" alt="Herdfy" style={{ width: '128px', height: '48px', objectFit: 'contain' }} loading="eager" width={128} height={48} />
-            </Link>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '64px' }}>
+            {/* Logo + nav links */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+              <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
+                <img src="/logo.png" alt="Herdfy" style={{ width: '128px', height: '48px', objectFit: 'contain' }} loading="eager" width={128} height={48} />
+              </Link>
 
-            {/* Desktop — nav centro */}
-            <div className="hidden md:flex" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', alignItems: 'center', gap: '32px' }}>
-              <Link href="/" style={linkStyle}>{t('campaigns')}</Link>
-              <Link href="/como-funciona" style={linkStyle}>{t('howItWorks')}</Link>
-              <Link href="/faq" style={linkStyle}>{t('faq')}</Link>
+              {/* Desktop — nav links */}
+              <div className="hidden md:flex" style={{ alignItems: 'center', gap: '28px' }}>
+                <Link href="/" style={navLinkStyle('/')}>{t('campaigns')}</Link>
+                <Link href="/como-funciona" style={navLinkStyle('/como-funciona')}>{t('howItWorks')}</Link>
+                <Link href="/faq" style={navLinkStyle('/faq')}>{t('faq')}</Link>
+              </div>
             </div>
 
             {/* Desktop — derecha */}
@@ -136,15 +149,15 @@ export default function Navbar() {
                 {t('explore')}
               </p>
               <Link href="/" onClick={closeMobileMenu}
-                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#1c2b22', textDecoration: 'none' }}>
+                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: isActive('/') ? 600 : 500, color: '#1c2b22', textDecoration: 'none', background: isActive('/') ? '#eaf5f0' : 'transparent' }}>
                 {t('campaigns')}
               </Link>
               <Link href="/como-funciona" onClick={closeMobileMenu}
-                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#1c2b22', textDecoration: 'none' }}>
+                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: isActive('/como-funciona') ? 600 : 500, color: '#1c2b22', textDecoration: 'none', background: isActive('/como-funciona') ? '#eaf5f0' : 'transparent' }}>
                 {t('howItWorks')}
               </Link>
               <Link href="/faq" onClick={closeMobileMenu}
-                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#1c2b22', textDecoration: 'none' }}>
+                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: isActive('/faq') ? 600 : 500, color: '#1c2b22', textDecoration: 'none', background: isActive('/faq') ? '#eaf5f0' : 'transparent' }}>
                 {t('faq')}
               </Link>
             </div>
