@@ -1,15 +1,20 @@
-import Link from 'next/link'
+'use client'
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  })
-}
+import { useTranslations, useLocale } from 'next-intl'
+import { Link } from '@/lib/i18nNavigation'
 
 export default function CampaignCard({ campaign }) {
+  const t = useTranslations('card')
+  const locale = useLocale()
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    })
+  }
 
   return (
     <Link
@@ -45,10 +50,9 @@ export default function CampaignCard({ campaign }) {
         <div className="space-y-2 text-xs text-gray-500">
           <div className="flex items-center gap-2">
             <span>📅</span>
-            <span>Hasta {formatDate(campaign.deadline)}</span>
+            <span>{t('deadline', { date: formatDate(campaign.deadline) })}</span>
           </div>
         </div>
-
       </div>
     </Link>
   )

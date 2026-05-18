@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import { Turnstile } from '@marsidev/react-turnstile'
 import Modal from './Modal'
 
@@ -21,14 +22,18 @@ function isCampaignExpired(campaign) {
 }
 
 export default function ParticipationForm({ campaign }) {
+  const t = useTranslations('form')
+  const locale = useLocale()
   const expired = isCampaignExpired(campaign)
   const used = getUsedFields(campaign.email_template)
+
+  const dateLocale = locale === 'ca' ? 'ca-ES' : 'es-ES'
 
   const [formData, setFormData] = useState({
     nombre: '',
     dni: '',
     localidad: '',
-    fecha: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }),
+    fecha: new Date().toLocaleDateString(dateLocale, { day: 'numeric', month: 'long', year: 'numeric' }),
     asunto: campaign.email_subject
   })
   const [message, setMessage] = useState(campaign.email_template)
@@ -48,7 +53,7 @@ export default function ParticipationForm({ campaign }) {
   useEffect(() => {
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
     if (used.fecha) {
-      const today = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+      const today = new Date().toLocaleDateString(dateLocale, { day: 'numeric', month: 'long', year: 'numeric' })
       setMessage(prev => prev.replace(/\(FECHA\)/g, today))
     }
   }, [])
@@ -178,11 +183,10 @@ export default function ParticipationForm({ campaign }) {
     boxSizing: 'border-box'
   }
 
-  // ── CAMPAÑA VENCIDA / INACTIVA ──
   if (expired) {
     return (
       <div>
-        <label style={labelStyle}>Mensaje de la campaña</label>
+        <label style={labelStyle}>{t('messageLabel')}</label>
         <textarea
           rows={8}
           value={campaign.email_template}
@@ -194,21 +198,20 @@ export default function ParticipationForm({ campaign }) {
     )
   }
 
-  // ── CAMPAÑA ACTIVA ──
   return (
     <div>
       <Modal
         isOpen={thankYouModal}
         onClose={() => setThankYouModal(false)}
-        title="¡Gracias por participar!"
-        message="Tu mensaje está listo para enviar. Recuerda enviarlo desde tu cliente de email para que tu participación cuente."
+        title={t('thankYouTitle')}
+        message={t('thankYouMessage')}
         type="success"
       />
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
         <div>
-          <label style={labelStyle}>Asunto del email</label>
+          <label style={labelStyle}>{t('subjectLabel')}</label>
           <input type="text" name="asunto" value={formData.asunto}
             onChange={(e) => setFormData(prev => ({ ...prev, asunto: e.target.value }))}
             style={inputStyle} />
@@ -216,15 +219,15 @@ export default function ParticipationForm({ campaign }) {
 
         {used.nombre && (
           <div>
-            <label style={labelStyle}>Nombre completo</label>
+            <label style={labelStyle}>{t('nameLabel')}</label>
             <input type="text" name="nombre" value={formData.nombre} onChange={handleChange}
-              style={inputStyle} placeholder="Tu nombre y apellidos" />
+              style={inputStyle} placeholder={t('namePlaceholder')} />
           </div>
         )}
 
         {used.dni && (
           <div>
-            <label style={labelStyle}>DNI</label>
+            <label style={labelStyle}>{t('dniLabel')}</label>
             <input type="text" name="dni" value={formData.dni} onChange={handleChange}
               style={inputStyle} placeholder="12345678A" />
           </div>
@@ -232,15 +235,15 @@ export default function ParticipationForm({ campaign }) {
 
         {used.localidad && (
           <div>
-            <label style={labelStyle}>Localidad</label>
+            <label style={labelStyle}>{t('localidadLabel')}</label>
             <input type="text" name="localidad" value={formData.localidad} onChange={handleChange}
-              style={inputStyle} placeholder="Tu ciudad o municipio" />
+              style={inputStyle} placeholder={t('localidadPlaceholder')} />
           </div>
         )}
 
         {used.fecha && (
           <div>
-            <label style={labelStyle}>Fecha</label>
+            <label style={labelStyle}>{t('fechaLabel')}</label>
             <input type="text" name="fecha" value={formData.fecha}
               onChange={(e) => {
                 const updated = { ...formData, fecha: e.target.value }
@@ -252,7 +255,9 @@ export default function ParticipationForm({ campaign }) {
         )}
 
         <div>
-          <label style={labelStyle}>Mensaje {campaign.allow_edit && '(puedes editarlo)'}</label>
+          <label style={labelStyle}>
+            {campaign.allow_edit ? t('messageLabelEditable') : t('messageLabelReadonly')}
+          </label>
           <textarea
             rows={8}
             value={message}
@@ -270,12 +275,12 @@ export default function ParticipationForm({ campaign }) {
             onSuccess={(token) => { setTurnstileToken(token); setCaptchaError(false) }}
             onError={() => { setTurnstileToken(null); setCaptchaError(true) }}
             onExpire={() => setTurnstileToken(null)}
-            options={{ theme: 'light', language: 'es', size: 'flexible' }}
+            options={{ theme: 'light', language: 'auto', size: 'flexible' }}
             style={{ width: '100%' }}
           />
           {captchaError && (
             <p style={{ fontSize: '12px', color: '#e53e3e', marginTop: '4px' }}>
-              Por favor, completa la verificación de seguridad.
+              {t('captchaError')}
             </p>
           )}
         </div>
@@ -285,12 +290,12 @@ export default function ParticipationForm({ campaign }) {
           {isMobile && (
             <button type="submit"
               style={{ width: '100%', padding: '12px', background: '#3a9e7a', color: 'white', border: 'none', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
-              Enviar desde mi email
+              {t('sendButton')}
             </button>
           )}
           <button type="button" onClick={handleCopyMessage}
             style={{ width: '100%', padding: '11px', background: 'transparent', color: '#3a9e7a', border: '1.5px solid #3a9e7a', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
-            {copied ? '¡Mensaje copiado!' : 'Copiar mensaje'}
+            {copied ? t('messageCopied') : t('copyMessage')}
           </button>
         </div>
 
@@ -298,22 +303,20 @@ export default function ParticipationForm({ campaign }) {
         <div style={{ display: 'none', gap: '10px' }} className="hidden md:flex">
           <button type="button" onClick={handleCopyRecipient}
             style={{ flex: 1, padding: '10px', border: '1.5px solid #e4e1da', color: '#4d5e56', borderRadius: '100px', background: 'transparent', fontFamily: 'DM Sans, sans-serif', fontWeight: 500, fontSize: '13px', cursor: 'pointer' }}>
-            {copiedRecipient ? '✅ Copiado' : 'Copiar destinatario'}
+            {copiedRecipient ? t('copied') : t('copyRecipient')}
           </button>
           <button type="button" onClick={handleCopySubject}
             style={{ flex: 1, padding: '10px', border: '1.5px solid #e4e1da', color: '#4d5e56', borderRadius: '100px', background: 'transparent', fontFamily: 'DM Sans, sans-serif', fontWeight: 500, fontSize: '13px', cursor: 'pointer' }}>
-            {copiedSubject ? '✅ Copiado' : 'Copiar asunto'}
+            {copiedSubject ? t('copied') : t('copySubject')}
           </button>
           <button type="button" onClick={handleCopyMessage}
             style={{ flex: 1, padding: '10px', background: '#3a9e7a', color: 'white', border: 'none', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
-            {copied ? '✅ Mensaje copiado' : 'Copiar mensaje'}
+            {copied ? t('messageCopiedDesktop') : t('copyMessage')}
           </button>
         </div>
 
         <p style={{ fontSize: '12px', color: '#94a3a0', textAlign: 'center' }}>
-          {isMobile
-            ? 'Opción 1: pulsa "Enviar desde mi email" para abrirlo directamente. Opción 2: copia el mensaje y pégalo en tu email.'
-            : 'Copia el mensaje, abre tu email y envíalo al destinatario indicado.'}
+          {isMobile ? t('mobileInstructions') : t('desktopInstructions')}
         </p>
 
       </form>

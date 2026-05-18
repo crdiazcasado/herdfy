@@ -6,6 +6,7 @@ import ScrollHint from '@/app/components/ScrollHint'
 import CampaignCreatorAlert from '@/app/components/CampaignCreatorAlert'
 import { supabaseServer as supabase } from '@/lib/supabaseServer'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 
 export const revalidate = 180
 
@@ -47,12 +48,15 @@ export async function generateMetadata({ params }) {
 
 export default async function CampaignDetail({ params }) {
   const resolvedParams = await params
-  const campaign = await getCampaign(resolvedParams.slug)
+  const { locale, slug } = resolvedParams
+  const campaign = await getCampaign(slug)
   if (!campaign) notFound()
+
+  const t = await getTranslations({ locale, namespace: 'campaign' })
 
   const formatDate = (dateString) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+    return date.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -76,9 +80,9 @@ export default async function CampaignDetail({ params }) {
                     {campaign.title}
                   </h1>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', color: '#4d5e56' }}>
-                    <span>📅 Hasta el {formatDate(campaign.deadline)}</span>
+                    <span>📅 {t('deadline', { date: formatDate(campaign.deadline) })}</span>
                     {campaign.participation_count > 0 && (
-                      <span>⚡ <strong style={{ color: '#1c2b22' }}>{campaign.participation_count}</strong> participaciones</span>
+                      <span>⚡ <strong style={{ color: '#1c2b22' }}>{campaign.participation_count}</strong> {t('participationsLabel', { count: campaign.participation_count })}</span>
                     )}
                   </div>
                   <div style={{ borderTop: '1px solid #e4e1da', paddingTop: '16px' }}>
@@ -98,21 +102,19 @@ export default async function CampaignDetail({ params }) {
             {/* ── COLUMNA DERECHA 2/3 ── */}
             <div className="campaign-main" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-              {/* Alert inactiva — solo para el creador (client component) */}
               <CampaignCreatorAlert campaign={campaign} />
 
-              {/* Banner campaña cerrada — para todos */}
               {isExpired && (
                 <div style={{ background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', padding: '24px', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                   <div style={{ fontSize: '32px', flexShrink: 0, lineHeight: 1 }}>🎉</div>
                   <div>
                     <p style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '17px', fontWeight: 700, color: '#1c2b22', marginBottom: '6px', lineHeight: 1.3 }}>
                       {count > 0
-                        ? `¡${count} ${count === 1 ? 'persona ha' : 'personas han'} participado en esta campaña!`
-                        : '¡Gracias a todos los que participaron!'}
+                        ? t('expiredWithCount', { count })
+                        : t('expiredNoCount')}
                     </p>
                     <p style={{ fontSize: '14px', color: '#4d5e56', lineHeight: 1.6, margin: 0 }}>
-                      El plazo de participación ya ha cerrado. Cada mensaje enviado ha contribuido a hacer llegar esta causa a quien tiene que escucharla.
+                      {t('expiredDescription')}
                     </p>
                   </div>
                 </div>
@@ -120,7 +122,7 @@ export default async function CampaignDetail({ params }) {
 
               <div style={{ background: 'white', padding: '24px', borderRadius: '12px', border: '1px solid #3a9e7a' }}>
                 <h2 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '18px', fontWeight: 700, color: '#1c2b22', marginBottom: '12px' }}>
-                  ¿Por qué es importante?
+                  {t('whyImportant')}
                 </h2>
                 <p style={{ fontSize: '14px', color: '#4d5e56', whiteSpace: 'pre-line', lineHeight: 1.7, margin: 0 }}>
                   {campaign.description}
@@ -134,7 +136,7 @@ export default async function CampaignDetail({ params }) {
                 <div style={{ padding: '0 24px 16px' }}>
                   <div style={{ borderTop: '1px solid #e4e1da', paddingTop: '16px' }}>
                     <p style={{ fontSize: '13px', color: '#94a3a0', marginBottom: '10px', fontWeight: 500 }}>
-                      📣 ¿Conoces a alguien que también debería participar? ¡Comparte!
+                      {t('sharePrompt')}
                     </p>
                     <ShareButton campaign={campaign} />
                   </div>
