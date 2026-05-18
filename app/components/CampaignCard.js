@@ -24,7 +24,7 @@ export default function CampaignCard({ campaign }) {
       <div className="flex-1 mb-2">
         <div className="relative mb-4">
           <img
-            src={campaign.image_url || '/sheep-hero.jpg'}
+            src={campaign.image_url || '/hero.webp'}
             className="w-full h-30 object-cover rounded-md"
             loading="lazy"
             width={400}

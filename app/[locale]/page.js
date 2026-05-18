@@ -76,7 +76,7 @@ export default function Home() {
       <main className="flex-1">
         <div
           className="relative py-12 md:py-16 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/sheep-hero.jpg)' }}
+          style={{ backgroundImage: 'url(/hero.webp)' }}
         >
           <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }} />
 

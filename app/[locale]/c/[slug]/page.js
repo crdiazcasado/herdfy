@@ -72,7 +72,7 @@ export default async function CampaignDetail({ params }) {
             {/* ── COLUMNA IZQUIERDA 1/3 ── */}
             <div className="campaign-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', overflow: 'hidden' }}>
-                <img src={campaign.image_url || '/sheep-hero.jpg'} alt={campaign.title}
+                <img src={campaign.image_url || '/hero.webp'} alt={campaign.title}
                   style={{ width: '100%', height: '208px', objectFit: 'cover', display: 'block' }}
                   loading="eager" width={600} height={208} />
                 <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
