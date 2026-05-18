@@ -149,15 +149,15 @@ export default function Navbar() {
                 {t('explore')}
               </p>
               <Link href="/" onClick={closeMobileMenu}
-                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: isActive('/') ? 600 : 500, color: '#1c2b22', textDecoration: 'none', background: isActive('/') ? '#eaf5f0' : 'transparent' }}>
+                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: isActive('/') ? 600 : 500, color: isActive('/') ? '#3a9e7a' : '#1c2b22', textDecoration: 'none', background: isActive('/') ? '#eaf5f0' : 'transparent' }}>
                 {t('campaigns')}
               </Link>
               <Link href="/como-funciona" onClick={closeMobileMenu}
-                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: isActive('/como-funciona') ? 600 : 500, color: '#1c2b22', textDecoration: 'none', background: isActive('/como-funciona') ? '#eaf5f0' : 'transparent' }}>
+                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: isActive('/como-funciona') ? 600 : 500, color: isActive('/como-funciona') ? '#3a9e7a' : '#1c2b22', textDecoration: 'none', background: isActive('/como-funciona') ? '#eaf5f0' : 'transparent' }}>
                 {t('howItWorks')}
               </Link>
               <Link href="/faq" onClick={closeMobileMenu}
-                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: isActive('/faq') ? 600 : 500, color: '#1c2b22', textDecoration: 'none', background: isActive('/faq') ? '#eaf5f0' : 'transparent' }}>
+                style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: isActive('/faq') ? 600 : 500, color: isActive('/faq') ? '#3a9e7a' : '#1c2b22', textDecoration: 'none', background: isActive('/faq') ? '#eaf5f0' : 'transparent' }}>
                 {t('faq')}
               </Link>
             </div>
