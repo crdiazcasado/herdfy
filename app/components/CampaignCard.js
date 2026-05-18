@@ -17,14 +17,22 @@ export default function CampaignCard({ campaign }) {
       className="flex flex-col bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow h-auto"
     >
       <div className="flex-1 mb-2">
-        <img
-          src={campaign.image_url || '/sheep-hero.jpg'}
-          className="w-full h-30 object-cover rounded-md mb-4"
-          loading="lazy"
-          width={400}
-          height={120}
-          alt={campaign.title}
-        />
+        <div className="relative mb-4">
+          <img
+            src={campaign.image_url || '/sheep-hero.jpg'}
+            className="w-full h-30 object-cover rounded-md"
+            loading="lazy"
+            width={400}
+            height={120}
+            alt={campaign.title}
+          />
+          {campaign.participation_count > 0 && (
+            <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center gap-1 text-sm font-semibold shadow-sm">
+              <span>⚡</span>
+              <span className="text-primary">{campaign.participation_count}</span>
+            </div>
+          )}
+        </div>
         <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
           {campaign.title}
         </h3>
@@ -41,14 +49,6 @@ export default function CampaignCard({ campaign }) {
           </div>
         </div>
 
-        {campaign.participation_count > 0 && (
-          <div className="flex justify-end mt-3 pt-3 border-t border-gray-100">
-            <div className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-1 text-sm font-semibold">
-              <span>⚡</span>
-              <span className="text-primary">{campaign.participation_count}</span>
-            </div>
-          </div>
-        )}
       </div>
     </Link>
   )
