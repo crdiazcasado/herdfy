@@ -9,21 +9,10 @@ import { notFound } from 'next/navigation'
 
 export const revalidate = 180
 
-const AVATAR_COLORS = {
-  violet: '#7c3aed', blue: '#2563eb', green: '#16a34a',
-  yellow: '#ca8a04', orange: '#ea580c', pink: '#db2777',
-  teal: '#0d9488', red: '#dc2626',
-}
-const AVATAR_BG = {
-  violet: '#ede9fe', blue: '#dbeafe', green: '#dcfce7',
-  yellow: '#fef9c3', orange: '#ffedd5', pink: '#fce7f3',
-  teal: '#ccfbf1', red: '#fee2e2',
-}
-
 async function getCampaign(slug) {
   const { data, error } = await supabase
     .from('campaigns')
-    .select(`*, users (name, email, avatar_color)`)
+    .select('*')
     .eq('slug', slug)
     .single()
   if (error || !data) return null
@@ -66,19 +55,9 @@ export default async function CampaignDetail({ params }) {
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
   }
 
-  const getCreatorName = () => {
-    if (campaign.users?.name) return campaign.users.name
-    if (campaign.users?.email) return campaign.users.email.split('@')[0]
-    return 'Anónimo'
-  }
-
   const today = new Date().toISOString().split('T')[0]
   const isExpired = campaign.status !== 'active' || (campaign.deadline && campaign.deadline < today)
   const count = campaign.participation_count || 0
-
-  const avatarColor = campaign.users?.avatar_color || 'violet'
-  const avatarBg = AVATAR_BG[avatarColor] || AVATAR_BG.violet
-  const avatarText = AVATAR_COLORS[avatarColor] || AVATAR_COLORS.violet
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f8f7f4' }}>
@@ -96,14 +75,6 @@ export default async function CampaignDetail({ params }) {
                   <h1 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '20px', fontWeight: 700, color: '#1c2b22', lineHeight: 1.3, margin: 0 }}>
                     {campaign.title}
                   </h1>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '28px', height: '28px', background: avatarBg, color: avatarText, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, flexShrink: 0 }}>
-                      {getCreatorName()[0].toUpperCase()}
-                    </div>
-                    <span style={{ fontSize: '13px', color: '#94a3a0' }}>
-                      Por <span style={{ fontWeight: 600, color: '#4d5e56' }}>{getCreatorName()}</span>
-                    </span>
-                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', color: '#4d5e56' }}>
                     <span>📅 Hasta el {formatDate(campaign.deadline)}</span>
                     {campaign.participation_count > 0 && (

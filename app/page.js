@@ -20,7 +20,7 @@ export default function Home() {
     const loadCampaigns = async () => {
       const { data, error } = await supabase
         .from('campaigns')
-        .select(`*, users (name, email, avatar_color)`)
+        .select('*')
         .eq('status', 'active')
         .order('created_at', { ascending: false })
 
