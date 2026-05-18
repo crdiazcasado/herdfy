@@ -22,15 +22,7 @@ export default function Footer() {
           </div>
 
           <div className="text-sm text-gray-400 text-center">
-            2026 · Hecho con ♥ por{' '}
-            <a
-              href="https://www.linkedin.com/in/crdiazcasado/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline font-medium"
-            >
-              Cristina Díaz
-            </a>
+            2026 · Herdfy
           </div>
 
         </div>
