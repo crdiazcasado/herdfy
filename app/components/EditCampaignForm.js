@@ -9,6 +9,11 @@ import ImageUpload from './ImageUpload'
 
 const today = new Date().toISOString().split('T')[0]
 
+function getInitialRecipients(campaign) {
+  if (campaign.recipients && campaign.recipients.length > 0) return campaign.recipients
+  return [{ name: campaign.recipient_name || '', email: campaign.recipient_email || '' }]
+}
+
 export default function EditCampaignForm({ campaign }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -17,15 +22,13 @@ export default function EditCampaignForm({ campaign }) {
   const [deleting, setDeleting] = useState(false)
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'success' })
 
-  // Si la fecha ha vencido y el estado es active, lo tratamos como inactive
   const isAutoInactive = campaign.status === 'active' && campaign.deadline && campaign.deadline < today
 
   const [formData, setFormData] = useState({
     title: campaign.title,
     description: campaign.description,
     deadline: campaign.deadline,
-    recipient_name: campaign.recipient_name,
-    recipient_email: campaign.recipient_email,
+    recipients: getInitialRecipients(campaign),
     email_subject: campaign.email_subject,
     email_template: campaign.email_template,
     allow_edit: campaign.allow_edit,
@@ -41,8 +44,25 @@ export default function EditCampaignForm({ campaign }) {
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
   }
 
+  const handleRecipientChange = (index, field, value) => {
+    setFormData(prev => {
+      const updated = [...prev.recipients]
+      updated[index] = { ...updated[index], [field]: value }
+      return { ...prev, recipients: updated }
+    })
+  }
+
+  const addRecipient = () => {
+    setFormData(prev => ({ ...prev, recipients: [...prev.recipients, { name: '', email: '' }] }))
+  }
+
+  const removeRecipient = (index) => {
+    setFormData(prev => ({ ...prev, recipients: prev.recipients.filter((_, i) => i !== index) }))
+  }
+
   const validateContent = () => {
-    const fields = [formData.title, formData.description, formData.email_template, formData.email_subject, formData.recipient_name]
+    const recipientNames = formData.recipients.map(r => r.name)
+    const fields = [formData.title, formData.description, formData.email_template, formData.email_subject, ...recipientNames]
     const found = fields.flatMap(f => findProfanity(f))
     return [...new Set(found)]
   }
@@ -57,7 +77,6 @@ export default function EditCampaignForm({ campaign }) {
       setLoading(false); return
     }
 
-    // Gestión de inactive_since
     let inactive_since = formData.inactive_since
     if (formData.status === 'inactive' && !inactive_since) {
       inactive_since = new Date().toISOString()
@@ -65,12 +84,15 @@ export default function EditCampaignForm({ campaign }) {
       inactive_since = null
     }
 
+    const firstRecipient = formData.recipients[0] || { name: '', email: '' }
+
     try {
       const { error: updateError } = await supabase.from('campaigns').update({
         title: formData.title,
         description: formData.description,
-        recipient_name: formData.recipient_name,
-        recipient_email: formData.recipient_email,
+        recipients: formData.recipients,
+        recipient_name: firstRecipient.name,
+        recipient_email: firstRecipient.email,
         deadline: formData.deadline,
         email_subject: formData.email_subject,
         email_template: formData.email_template,
@@ -144,16 +166,39 @@ export default function EditCampaignForm({ campaign }) {
         </div>
 
         <div style={sectionStyle}>
-          <h2 style={sectionTitleStyle}>Destinatario</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div>
-              <label style={labelStyle}>Nombre del organismo *</label>
-              <input type="text" name="recipient_name" value={formData.recipient_name} onChange={handleChange} required style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Email de destino *</label>
-              <input type="email" name="recipient_email" value={formData.recipient_email} onChange={handleChange} required style={inputStyle} />
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+            <h2 style={{ ...sectionTitleStyle, marginBottom: 0 }}>Destinatarios</h2>
+            <button type="button" onClick={addRecipient}
+              style={{ padding: '5px 14px', background: '#f0faf5', border: '1.5px solid #3a9e7a', color: '#3a9e7a', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
+              + Añadir destinatario
+            </button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {formData.recipients.map((recipient, index) => (
+              <div key={index} style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '14px', background: '#f8f7f4', border: '1px solid #e4e1da', borderRadius: '10px' }}>
+                {formData.recipients.length > 1 && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3a0', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Destinatario {index + 1}
+                    </span>
+                    <button type="button" onClick={() => removeRecipient(index)}
+                      style={{ padding: '2px 10px', background: 'transparent', border: '1px solid #fed7d7', color: '#c53030', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontSize: '12px', cursor: 'pointer' }}>
+                      Eliminar
+                    </button>
+                  </div>
+                )}
+                <div>
+                  <label style={labelStyle}>Nombre del organismo *</label>
+                  <input type="text" value={recipient.name} onChange={(e) => handleRecipientChange(index, 'name', e.target.value)}
+                    required style={{ ...inputStyle, background: 'white' }} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Email de destino *</label>
+                  <input type="email" value={recipient.email} onChange={(e) => handleRecipientChange(index, 'email', e.target.value)}
+                    required style={{ ...inputStyle, background: 'white' }} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

@@ -76,7 +76,9 @@ export default function Dashboard() {
                       <div className="flex-1">
                         <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">{campaign.title}</h3>
                         <p className="text-sm md:text-base text-gray-600 mb-3">
-                          {campaign.recipient_name} · {campaign.recipient_email}
+                          {campaign.recipients?.length > 1
+                            ? `${campaign.recipients[0].name} y ${campaign.recipients.length - 1} más`
+                            : `${campaign.recipient_name} · ${campaign.recipient_email}`}
                         </p>
                         <div className="flex flex-wrap gap-3 md:gap-4 text-xs md:text-sm text-gray-500">
                           <span>📅 {formatDate(campaign.deadline)}</span>

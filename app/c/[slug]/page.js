@@ -112,8 +112,11 @@ export default async function CampaignDetail({ params }) {
                   </div>
                   <div style={{ borderTop: '1px solid #e4e1da', paddingTop: '16px' }}>
                     <CampaignDetailClient
-                      recipientName={campaign.recipient_name}
-                      recipientEmail={campaign.recipient_email}
+                      recipients={
+                        campaign.recipients?.length > 0
+                          ? campaign.recipients
+                          : [{ name: campaign.recipient_name, email: campaign.recipient_email }]
+                      }
                       campaign={campaign}
                     />
                   </div>

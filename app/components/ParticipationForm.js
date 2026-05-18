@@ -32,6 +32,10 @@ export default function ParticipationForm({ campaign }) {
     asunto: campaign.email_subject
   })
   const [message, setMessage] = useState(campaign.email_template)
+  const recipients = campaign.recipients?.length > 0
+    ? campaign.recipients
+    : [{ name: campaign.recipient_name, email: campaign.recipient_email }]
+
   const [copied, setCopied] = useState(false)
   const [copiedRecipient, setCopiedRecipient] = useState(false)
   const [copiedSubject, setCopiedSubject] = useState(false)
@@ -130,9 +134,10 @@ export default function ParticipationForm({ campaign }) {
     }
     const subject = encodeURIComponent(formData.asunto)
     const body = encodeURIComponent(getFinalMessage())
+    const allEmails = recipients.map(r => r.email).join(',')
     await incrementParticipation()
     setTimeout(() => setThankYouModal(true), 800)
-    window.location.href = `mailto:${campaign.recipient_email}?subject=${subject}&body=${body}`
+    window.location.href = `mailto:${allEmails}?subject=${subject}&body=${body}`
   }
 
   const handleCopyMessage = async (e) => {
@@ -146,7 +151,8 @@ export default function ParticipationForm({ campaign }) {
 
   const handleCopyRecipient = async () => {
     try {
-      await copyToClipboard(campaign.recipient_email)
+      const allEmails = recipients.map(r => r.email).join(', ')
+      await copyToClipboard(allEmails)
       setCopiedRecipient(true)
       setTimeout(() => setCopiedRecipient(false), 3000)
     } catch { console.log('Portapapeles no disponible') }
