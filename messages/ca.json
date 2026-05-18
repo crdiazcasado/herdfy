@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "campaigns": "Campanyes",
+    "howItWorks": "Com funciona",
+    "faq": "FAQ",
+    "explore": "Explorar",
+    "createCampaign": "+ Crea una campanya",
+    "menu": "Menú"
+  },
+  "footer": {
+    "tagline": "Tothom a una!",
+    "privacy": "Privadesa",
+    "cookies": "Galetes",
+    "terms": "Termes",
+    "legal": "Avís legal",
+    "copyright": "2026 · Herdfy"
+  }
+}

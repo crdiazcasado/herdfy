@@ -1,4 +1,4 @@
-import CreateCampaignForm from '../../components/CreateCampaignForm'
+import CreateCampaignForm from '@/app/components/CreateCampaignForm'
 
 export default function NewCampaign() {
   return (

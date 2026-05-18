@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
-import CampaignCard from './components/CampaignCard'
-import NoResults from './components/NoResults'
-import { supabase } from '../lib/supabase'
+import CampaignCard from '@/app/components/CampaignCard'
+import NoResults from '@/app/components/NoResults'
+import { supabase } from '@/lib/supabase'
 
 const PAGE_SIZE = 12 
 

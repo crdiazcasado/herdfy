@@ -12,6 +12,7 @@
     "@marsidev/react-turnstile": "^1.4.2",
     "@supabase/supabase-js": "^2.95.3",
     "next": "16.1.6",
+    "next-intl": "^4.12.0",
     "posthog-js": "^1.350.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",

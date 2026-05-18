@@ -1,10 +1,10 @@
-import ParticipationForm from '../../components/ParticipationForm'
-import ShareButton from '../../components/ShareButton'
-import CampaignDetailClient from '../../components/CampaignDetailClient'
-import ReportButton from '../../components/ReportButton'
-import ScrollHint from '../../components/ScrollHint'
-import CampaignCreatorAlert from '../../components/CampaignCreatorAlert'
-import { supabaseServer as supabase } from '../../../lib/supabaseServer'
+import ParticipationForm from '@/app/components/ParticipationForm'
+import ShareButton from '@/app/components/ShareButton'
+import CampaignDetailClient from '@/app/components/CampaignDetailClient'
+import ReportButton from '@/app/components/ReportButton'
+import ScrollHint from '@/app/components/ScrollHint'
+import CampaignCreatorAlert from '@/app/components/CampaignCreatorAlert'
+import { supabaseServer as supabase } from '@/lib/supabaseServer'
 import { notFound } from 'next/navigation'
 
 export const revalidate = 180

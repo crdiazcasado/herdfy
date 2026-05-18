@@ -1,5 +1,5 @@
-import EditCampaignForm from '../../../components/EditCampaignForm'
-import { supabaseServer } from '../../../../lib/supabaseServer'
+import EditCampaignForm from '@/app/components/EditCampaignForm'
+import { supabaseServer } from '@/lib/supabaseServer'
 import { notFound } from 'next/navigation'
 
 async function getCampaign(id) {
