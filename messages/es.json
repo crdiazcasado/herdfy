@@ -14,5 +14,151 @@
     "terms": "Términos",
     "legal": "Aviso legal",
     "copyright": "2026 · Herdfy"
+  },
+  "dashboard": {
+    "title": "Mis campañas",
+    "newCampaign": "+ Nueva campaña",
+    "loading": "Cargando campañas...",
+    "participations": "participaciones",
+    "andMore": "y {count} más",
+    "edit": "Editar",
+    "view": "Ver",
+    "status": {
+      "active": "Activa",
+      "inactive": "Inactiva",
+      "draft": "Borrador"
+    },
+    "empty": {
+      "title": "Aún no has creado ninguna campaña",
+      "description": "Crea tu primera campaña y empieza a movilizar al rebaño",
+      "cta": "Crear mi primera campaña"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Accede para gestionar tus campañas",
+      "submit": "Iniciar sesión",
+      "noAccount": "¿No tienes cuenta?",
+      "register": "Regístrate",
+      "forgotPassword": "¿Olvidaste tu contraseña?"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "subtitle": "Crea tu cuenta para empezar a organizar",
+      "submit": "Crear cuenta",
+      "hasAccount": "¿Ya tienes cuenta?",
+      "loginLink": "Inicia sesión",
+      "captchaError": "Por favor, completa la verificación de seguridad."
+    },
+    "forgotPassword": {
+      "title": "Recuperar contraseña",
+      "subtitle": "Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.",
+      "submit": "Enviar enlace",
+      "sending": "Enviando...",
+      "backToLogin": "Volver al inicio de sesión",
+      "successTitle": "Email enviado",
+      "successMessage": "Revisa tu bandeja de entrada. Te hemos enviado un enlace para restablecer tu contraseña."
+    },
+    "fields": {
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "email": "Email",
+      "password": "Contraseña"
+    },
+    "loading": "Cargando...",
+    "accountCreatedTitle": "¡Cuenta creada!",
+    "accountCreatedMessage": "Tu cuenta se ha creado correctamente. Ya puedes iniciar sesión.",
+    "loginError": "Debes iniciar sesión para crear una campaña"
+  },
+  "userMenu": {
+    "login": "Iniciar sesión",
+    "myAccount": "Mi cuenta",
+    "myCampaigns": "Mis campañas",
+    "myProfile": "Mi perfil",
+    "logout": "Cerrar sesión",
+    "connectedAs": "Conectado como"
+  },
+  "modal": {
+    "understood": "Entendido"
+  },
+  "resetPassword": {
+    "title": "Nueva contraseña",
+    "subtitle": "Introduce tu nueva contraseña.",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "submit": "Guardar contraseña",
+    "saving": "Guardando...",
+    "success": "✅ Contraseña actualizada. Redirigiendo al login...",
+    "errorMismatch": "Las contraseñas no coinciden",
+    "errorMinLength": "La contraseña debe tener al menos 6 caracteres"
+  },
+  "perfil": {
+    "username": "Nombre de usuario",
+    "profileUpdated": "✅ Perfil actualizado",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Tu nombre",
+    "avatarColor": "Color del avatar",
+    "saveChanges": "Guardar cambios",
+    "saving": "Guardando...",
+    "changePassword": "Cambiar contraseña",
+    "passwordUpdated": "✅ Contraseña actualizada",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar nueva contraseña",
+    "changePasswordBtn": "Cambiar contraseña",
+    "errorMismatch": "Las contraseñas no coinciden",
+    "errorMinLength": "La contraseña debe tener al menos 6 caracteres"
+  },
+  "campaignForm": {
+    "basicInfo": "Información básica",
+    "coverImage": "Imagen de portada *",
+    "imageLabel": "Imagen de portada",
+    "campaignTitle": "Título de la campaña *",
+    "campaignTitlePlaceholder": "Ej: Protección para perros de caza",
+    "titleLabel": "Título *",
+    "description": "Descripción *",
+    "descriptionPlaceholder": "Explica por qué es importante esta campaña...",
+    "deadline": "Fecha límite *",
+    "status": "Estado *",
+    "statusActive": "Activa — visible para todo el mundo",
+    "statusInactive": "Inactiva — solo visible para ti",
+    "statusDraft": "Borrador — solo visible para ti",
+    "autoInactiveNotice": "La campaña pasó a inactiva automáticamente porque venció la fecha límite.",
+    "recipients": "Destinatarios",
+    "addRecipient": "+ Añadir destinatario",
+    "recipientLabel": "Destinatario {number}",
+    "removeRecipient": "Eliminar",
+    "recipientName": "Nombre del organismo *",
+    "recipientNamePlaceholder": "Ej: Ministerio de Agricultura",
+    "recipientEmail": "Email de destino *",
+    "recipientEmailPlaceholder": "consulta@ministerio.es",
+    "messageTemplate": "Plantilla del mensaje",
+    "emailSubject": "Asunto del email *",
+    "emailSubjectPlaceholder": "Alegaciones al Real Decreto...",
+    "emailBody": "Cuerpo del mensaje *",
+    "variablesHint": "📌 Usa estas variables donde quieras insertar los datos del participante:",
+    "variablesHintEdit": "📌 Variables disponibles para personalizar el mensaje:",
+    "variablesNote": "Solo aparecerán los campos que uses. Si no pones",
+    "variablesNote2": ", no se lo pediremos al participante.",
+    "allowEdit": "Permitir que los participantes editen el mensaje",
+    "security": "Verificación de seguridad *",
+    "captchaError": "Por favor, completa la verificación de seguridad.",
+    "creating": "Creando...",
+    "createCampaign": "Crear campaña",
+    "saving": "Guardando...",
+    "saveChanges": "Guardar cambios",
+    "cancel": "Cancelar",
+    "deleteCampaign": "🗑️ Eliminar campaña",
+    "deleteConfirmTitle": "¿Eliminar campaña?",
+    "deleteConfirmMessage": "Esta acción no se puede deshacer. La campaña y todas sus participaciones se eliminarán permanentemente.",
+    "deleteConfirmBtn": "Sí, eliminar",
+    "deleting": "Eliminando...",
+    "profanityTitle": "Contenido no permitido",
+    "profanityMessage": "El texto contiene palabras no permitidas: \"{words}\".",
+    "campaignCreatedTitle": "¡Campaña creada!",
+    "campaignCreatedMessage": "Tu campaña se ha creado con éxito.",
+    "campaignUpdatedTitle": "¡Cambios guardados!",
+    "campaignUpdatedMessage": "La campaña se ha actualizado correctamente.",
+    "loginRequired": "Debes iniciar sesión para crear una campaña"
   }
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 const COLORS = [
   { id: 'violet', bg: 'bg-violet-200', text: 'text-violet-700' },
@@ -18,6 +19,7 @@ const COLORS = [
 const DEFAULT_COLOR = COLORS[0]
 
 export default function Perfil() {
+  const t = useTranslations('perfil')
   const router = useRouter()
   const [user, setUser] = useState(null)
   const [name, setName] = useState('')
@@ -81,11 +83,11 @@ export default function Perfil() {
     setSuccessPassword(false)
 
     if (newPassword !== confirmPassword) {
-      setErrorPassword('Las contraseñas no coinciden')
+      setErrorPassword(t('errorMismatch'))
       return
     }
     if (newPassword.length < 6) {
-      setErrorPassword('La contraseña debe tener al menos 6 caracteres')
+      setErrorPassword(t('errorMinLength'))
       return
     }
 
@@ -138,29 +140,28 @@ export default function Perfil() {
 
             {/* Nombre y color */}
             <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Nombre de usuario</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('username')}</h2>
               {errorName && (
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{errorName}</div>
               )}
               {successName && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">✅ Perfil actualizado</div>
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">{t('profileUpdated')}</div>
               )}
               <form onSubmit={handleUpdateName} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('nameLabel')}</label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="Tu nombre"
+                    placeholder={t('namePlaceholder')}
                   />
                 </div>
 
-                {/* Selector de color */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Color del avatar</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('avatarColor')}</label>
                   <div className="flex gap-3 flex-wrap">
                     {COLORS.map((color) => (
                       <button
@@ -183,23 +184,23 @@ export default function Perfil() {
                   disabled={loadingName}
                   className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium disabled:opacity-50"
                 >
-                  {loadingName ? 'Guardando...' : 'Guardar cambios'}
+                  {loadingName ? t('saving') : t('saveChanges')}
                 </button>
               </form>
             </div>
 
             {/* Cambiar contraseña */}
             <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Cambiar contraseña</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('changePassword')}</h2>
               {errorPassword && (
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{errorPassword}</div>
               )}
               {successPassword && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">✅ Contraseña actualizada</div>
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">{t('passwordUpdated')}</div>
               )}
               <form onSubmit={handleUpdatePassword} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nueva contraseña</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('newPassword')}</label>
                   <input
                     type="password"
                     value={newPassword}
@@ -211,7 +212,7 @@ export default function Perfil() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar nueva contraseña</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('confirmPassword')}</label>
                   <input
                     type="password"
                     value={confirmPassword}
@@ -227,7 +228,7 @@ export default function Perfil() {
                   disabled={loadingPassword}
                   className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium disabled:opacity-50"
                 >
-                  {loadingPassword ? 'Guardando...' : 'Cambiar contraseña'}
+                  {loadingPassword ? t('saving') : t('changePasswordBtn')}
                 </button>
               </form>
             </div>

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-
+import { useTranslations } from 'next-intl'
 
 export default function ResetPassword() {
+  const t = useTranslations('resetPassword')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -18,11 +19,11 @@ export default function ResetPassword() {
     setError(null)
 
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden')
+      setError(t('errorMismatch'))
       return
     }
     if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres')
+      setError(t('errorMinLength'))
       return
     }
 
@@ -44,12 +45,12 @@ export default function ResetPassword() {
       <main className="flex-1 bg-gray-50">
         <div className="max-w-md mx-auto px-4 py-16">
           <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Nueva contraseña</h1>
-            <p className="text-gray-600 mb-8">Introduce tu nueva contraseña.</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('title')}</h1>
+            <p className="text-gray-600 mb-8">{t('subtitle')}</p>
 
             {success ? (
               <div className="p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm text-center">
-                ✅ Contraseña actualizada. Redirigiendo al login...
+                {t('success')}
               </div>
             ) : (
               <>
@@ -60,7 +61,7 @@ export default function ResetPassword() {
                 )}
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nueva contraseña</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('newPassword')}</label>
                     <input
                       type="password"
                       value={password}
@@ -72,7 +73,7 @@ export default function ResetPassword() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar contraseña</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('confirmPassword')}</label>
                     <input
                       type="password"
                       value={confirmPassword}
@@ -88,7 +89,7 @@ export default function ResetPassword() {
                     disabled={loading}
                     className="w-full px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium disabled:opacity-50"
                   >
-                    {loading ? 'Guardando...' : 'Guardar contraseña'}
+                    {loading ? t('saving') : t('submit')}
                   </button>
                 </form>
               </>

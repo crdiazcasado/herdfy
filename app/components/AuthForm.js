@@ -5,6 +5,7 @@ import { Turnstile } from '@marsidev/react-turnstile'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 import Modal from './Modal'
+import { useTranslations } from 'next-intl'
 
 const EyeIcon = ({ open }) => open ? (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -20,6 +21,7 @@ const EyeIcon = ({ open }) => open ? (
 )
 
 export default function AuthForm() {
+  const t = useTranslations('auth')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
@@ -55,7 +57,7 @@ export default function AuthForm() {
         redirectTo: `${window.location.origin}/reset-password`
       })
       if (error) throw error
-      setModal({ isOpen: true, title: 'Email enviado', message: 'Revisa tu bandeja de entrada. Te hemos enviado un enlace para restablecer tu contraseña.', type: 'success' })
+      setModal({ isOpen: true, title: t('forgotPassword.successTitle'), message: t('forgotPassword.successMessage'), type: 'success' })
       setIsForgotPassword(false)
       setEmail('')
     } catch (error) {
@@ -91,8 +93,8 @@ export default function AuthForm() {
           body: JSON.stringify({ email, password, name }),
         })
         const data = await response.json()
-        if (!response.ok) throw new Error(data.error || 'Error al crear la cuenta')
-        setModal({ isOpen: true, title: '¡Cuenta creada!', message: 'Tu cuenta se ha creado correctamente. Ya puedes iniciar sesión.', type: 'success' })
+        if (!response.ok) throw new Error(data.error || t('loginError'))
+        setModal({ isOpen: true, title: t('accountCreatedTitle'), message: t('accountCreatedMessage'), type: 'success' })
         setIsLogin(true)
         setEmail('')
         setPassword('')
@@ -119,25 +121,25 @@ export default function AuthForm() {
         <Modal isOpen={modal.isOpen} onClose={() => setModal(p => ({ ...p, isOpen: false }))} title={modal.title} message={modal.message} type={modal.type} />
         <div style={cardStyle}>
           <h1 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '28px', fontWeight: 700, color: '#1c2b22', marginBottom: '6px' }}>
-            Recuperar contraseña
+            {t('forgotPassword.title')}
           </h1>
           <p style={{ fontSize: '14px', color: '#94a3a0', marginBottom: '28px' }}>
-            Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.
+            {t('forgotPassword.subtitle')}
           </p>
           {error && <div style={errorBox}>{error}</div>}
           <form onSubmit={handleForgotPassword} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div>
-              <label style={labelStyle}>Email</label>
+              <label style={labelStyle}>{t('fields.email')}</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={inputStyle} placeholder="tu@email.com" />
             </div>
             <button type="submit" disabled={loading} style={{ ...btnPrimary, background: loading ? '#94a3a0' : '#3a9e7a', cursor: loading ? 'not-allowed' : 'pointer' }}>
-              {loading ? 'Enviando...' : 'Enviar enlace'}
+              {loading ? t('forgotPassword.sending') : t('forgotPassword.submit')}
             </button>
           </form>
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <button onClick={() => { setIsForgotPassword(false); setError(null) }}
               style={{ fontSize: '13px', color: '#4d5e56', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
-              ← <span style={{ color: '#3a9e7a', fontWeight: 600 }}>Volver al inicio de sesión</span>
+              ← <span style={{ color: '#3a9e7a', fontWeight: 600 }}>{t('forgotPassword.backToLogin')}</span>
             </button>
           </div>
         </div>
@@ -152,10 +154,10 @@ export default function AuthForm() {
 
       <div style={cardStyle}>
         <h1 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '28px', fontWeight: 700, color: '#1c2b22', marginBottom: '6px' }}>
-          {isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
+          {isLogin ? t('login.title') : t('register.title')}
         </h1>
         <p style={{ fontSize: '14px', color: '#94a3a0', marginBottom: '28px' }}>
-          {isLogin ? 'Accede para gestionar tus campañas' : 'Crea tu cuenta para empezar a organizar'}
+          {isLogin ? t('login.subtitle') : t('register.subtitle')}
         </p>
 
         {error && <div style={errorBox}>{error}</div>}
@@ -164,23 +166,23 @@ export default function AuthForm() {
 
           {!isLogin && (
             <div>
-              <label style={labelStyle}>Nombre</label>
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} required={!isLogin} style={inputStyle} placeholder="Tu nombre" />
+              <label style={labelStyle}>{t('fields.name')}</label>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} required={!isLogin} style={inputStyle} placeholder={t('fields.namePlaceholder')} />
             </div>
           )}
 
           <div>
-            <label style={labelStyle}>Email</label>
+            <label style={labelStyle}>{t('fields.email')}</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={inputStyle} placeholder="tu@email.com" />
           </div>
 
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <label style={{ ...labelStyle, marginBottom: 0 }}>Contraseña</label>
+              <label style={{ ...labelStyle, marginBottom: 0 }}>{t('fields.password')}</label>
               {isLogin && (
                 <button type="button" onClick={() => { setIsForgotPassword(true); setError(null) }}
                   style={{ fontSize: '12px', color: '#3a9e7a', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
-                  ¿Olvidaste tu contraseña?
+                  {t('login.forgotPassword')}
                 </button>
               )}
             </div>
@@ -215,13 +217,13 @@ export default function AuthForm() {
                 options={{ theme: 'light', language: 'es', size: 'flexible' }}
                 style={{ width: '100%' }}
               />
-              {captchaError && <p style={{ fontSize: '12px', color: '#e53e3e', marginTop: '4px' }}>Por favor, completa la verificación de seguridad.</p>}
+              {captchaError && <p style={{ fontSize: '12px', color: '#e53e3e', marginTop: '4px' }}>{t('register.captchaError')}</p>}
             </div>
           )}
 
           <button type="submit" disabled={loading}
             style={{ ...btnPrimary, background: loading ? '#94a3a0' : '#3a9e7a', cursor: loading ? 'not-allowed' : 'pointer', marginTop: '4px' }}>
-            {loading ? 'Cargando...' : isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
+            {loading ? t('loading') : isLogin ? t('login.submit') : t('register.submit')}
           </button>
         </form>
 
@@ -230,9 +232,9 @@ export default function AuthForm() {
             onClick={() => { setIsLogin(!isLogin); setError(null); setCaptchaError(false); setTurnstileToken(null) }}
             style={{ fontSize: '13px', color: '#4d5e56', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
             {isLogin ? (
-              <>¿No tienes cuenta? <span style={{ color: '#3a9e7a', fontWeight: 600 }}>Regístrate</span></>
+              <>{t('login.noAccount')} <span style={{ color: '#3a9e7a', fontWeight: 600 }}>{t('login.register')}</span></>
             ) : (
-              <>¿Ya tienes cuenta? <span style={{ color: '#3a9e7a', fontWeight: 600 }}>Inicia sesión</span></>
+              <>{t('register.hasAccount')} <span style={{ color: '#3a9e7a', fontWeight: 600 }}>{t('register.loginLink')}</span></>
             )}
           </button>
         </div>

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 const AVATAR_COLORS = {
   violet: { bg: '#ede9fe', text: '#7c3aed' },
@@ -16,6 +17,7 @@ const AVATAR_COLORS = {
 }
 
 export default function UserMenu({ mobile = false, onClose }) {
+  const t = useTranslations('userMenu')
   const [user, setUser] = useState(null)
   const [userName, setUserName] = useState('')
   const [avatarColor, setAvatarColor] = useState('violet')
@@ -67,7 +69,7 @@ export default function UserMenu({ mobile = false, onClose }) {
     return (
       <Link href="/login" onClick={onClose}
         style={{ display: 'block', padding: '14px', background: '#3a9e7a', color: 'white', borderRadius: '100px', textAlign: 'center', fontWeight: 700, fontSize: '15px', textDecoration: 'none' }}>
-        Iniciar sesión
+        {t('login')}
       </Link>
     )
   }
@@ -77,7 +79,7 @@ export default function UserMenu({ mobile = false, onClose }) {
     return (
       <Link href="/login"
         style={{ padding: '8px 20px', border: '1.5px solid #3a9e7a', color: '#3a9e7a', borderRadius: '100px', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>
-        Iniciar sesión
+        {t('login')}
       </Link>
     )
   }
@@ -86,7 +88,6 @@ export default function UserMenu({ mobile = false, onClose }) {
   if (mobile) {
     return (
       <div>
-        {/* Bloque usuario — tarjeta con fondo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '16px', background: 'white', borderRadius: '14px', border: '1px solid #e4e1da', marginBottom: '8px' }}>
           <div style={{ width: '48px', height: '48px', background: colors.bg, color: colors.text, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 700, flexShrink: 0 }}>
             {displayName[0].toUpperCase()}
@@ -101,24 +102,22 @@ export default function UserMenu({ mobile = false, onClose }) {
           </div>
         </div>
 
-        {/* Label sección */}
         <p style={{ fontSize: '11px', fontWeight: 700, color: '#94a3a0', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '16px 0 8px', paddingLeft: '12px' }}>
-          Mi cuenta
+          {t('myAccount')}
         </p>
 
-        {/* Links */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <Link href="/dashboard" onClick={onClose}
             style={{ padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#1c2b22', textDecoration: 'none', display: 'block' }}>
-            Mis campañas
+            {t('myCampaigns')}
           </Link>
           <Link href="/perfil" onClick={onClose}
             style={{ padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#1c2b22', textDecoration: 'none', display: 'block' }}>
-            Mi perfil
+            {t('myProfile')}
           </Link>
           <button onClick={handleLogout}
             style={{ padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#e53e3e', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', width: '100%', marginTop: '4px' }}>
-            Cerrar sesión
+            {t('logout')}
           </button>
         </div>
       </div>
@@ -141,13 +140,13 @@ export default function UserMenu({ mobile = false, onClose }) {
           <div style={{ position: 'fixed', inset: 0, zIndex: 10 }} onClick={handleCloseMenu} />
           <div style={{ position: 'absolute', right: 0, marginTop: '8px', width: '200px', background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)', zIndex: 20, overflow: 'hidden' }}>
             <div style={{ padding: '14px 16px', borderBottom: '1px solid #e4e1da' }}>
-              <div style={{ fontSize: '13px', color: '#94a3a0', marginBottom: '2px' }}>Conectado como</div>
+              <div style={{ fontSize: '13px', color: '#94a3a0', marginBottom: '2px' }}>{t('connectedAs')}</div>
               <div style={{ fontSize: '13px', fontWeight: 600, color: '#1c2b22', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
             </div>
-            <Link href="/dashboard" onClick={handleCloseMenu} style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: '#1c2b22', textDecoration: 'none' }}>Mis campañas</Link>
-            <Link href="/perfil" onClick={handleCloseMenu} style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: '#1c2b22', textDecoration: 'none' }}>Mi perfil</Link>
+            <Link href="/dashboard" onClick={handleCloseMenu} style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: '#1c2b22', textDecoration: 'none' }}>{t('myCampaigns')}</Link>
+            <Link href="/perfil" onClick={handleCloseMenu} style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: '#1c2b22', textDecoration: 'none' }}>{t('myProfile')}</Link>
             <button onClick={handleLogout} style={{ display: 'block', width: '100%', padding: '10px 16px', fontSize: '14px', color: '#e53e3e', background: 'transparent', border: 'none', borderTop: '1px solid #e4e1da', cursor: 'pointer', textAlign: 'left' }}>
-              Cerrar sesión
+              {t('logout')}
             </button>
           </div>
         </>

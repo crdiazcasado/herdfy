@@ -1,10 +1,91 @@
-
 export const metadata = {
   title: 'Aviso legal | Herdfy',
   robots: 'noindex'
 }
 
-export default function AvisoLegal() {
+export default async function AvisoLegal({ params }) {
+  const { locale } = await params
+  const isCA = locale === 'ca'
+
+  if (isCA) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-1 bg-gray-50">
+          <div className="max-w-3xl mx-auto px-4 py-12">
+            <div className="bg-white rounded-xl border border-gray-200 p-8 space-y-8">
+
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Avís legal</h1>
+                <p className="text-sm text-gray-500">Darrera actualització: febrer de 2026</p>
+              </div>
+
+              <section className="space-y-3">
+                <h2 className="text-xl font-semibold text-gray-900">1. Titular del lloc web</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  El present lloc web <strong>herdfy.com</strong> és un projecte personal sense
+                  personalitat jurídica pròpia. Per a qualsevol comunicació, podeu contactar
+                  a través de: <a href="mailto:legal@herdfy.com" className="text-primary underline">legal@herdfy.com</a>.
+                </p>
+              </section>
+
+              <section className="space-y-3">
+                <h2 className="text-xl font-semibold text-gray-900">2. Objecte i àmbit d'aplicació</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  El present avís legal regula l'accés i l'ús del lloc web herdfy.com,
+                  de conformitat amb el que estableix la Llei 34/2002, d'11 de juliol, de
+                  Serveis de la Societat de la Informació i de Comerç Electrònic (LSSI-CE).
+                </p>
+              </section>
+
+              <section className="space-y-3">
+                <h2 className="text-xl font-semibold text-gray-900">3. Propietat intel·lectual</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  El nom, logotip, disseny i codi font de Herdfy són propietat del seu titular.
+                  Queda prohibida la seva reproducció, distribució o modificació sense autorització expressa.
+                </p>
+                <p className="text-gray-700 leading-relaxed">
+                  El contingut de les campanyes (textos, imatges) és responsabilitat exclusiva
+                  dels usuaris que les creen.
+                </p>
+              </section>
+
+              <section className="space-y-3">
+                <h2 className="text-xl font-semibold text-gray-900">4. Exclusió de responsabilitat</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  Herdfy no es responsabilitza dels danys o perjudicis que puguin derivar-se de:
+                </p>
+                <ul className="list-disc pl-6 space-y-2 text-gray-700">
+                  <li>El contingut publicat pels usuaris a les seves campanyes.</li>
+                  <li>Interrupcions o fallades tècniques del servei.</li>
+                  <li>L'ús que els participants facin dels missatges generats.</li>
+                  <li>Accessos no autoritzats derivats de vulnerabilitats fora del nostre control.</li>
+                </ul>
+              </section>
+
+              <section className="space-y-3">
+                <h2 className="text-xl font-semibold text-gray-900">5. Enllaços a tercers</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  Herdfy pot contenir enllaços a llocs web de tercers. No ens fem responsables
+                  del contingut ni de les pràctiques de privadesa d'aquests llocs.
+                </p>
+              </section>
+
+              <section className="space-y-3">
+                <h2 className="text-xl font-semibold text-gray-900">6. Legislació aplicable</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  Aquest avís legal es regeix per la legislació espanyola. Qualsevol controvèrsia
+                  derivada de l'accés o l'ús del lloc web se sotmetrà als jutjats i tribunals
+                  competents d'acord amb la normativa vigent.
+                </p>
+              </section>
+
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 bg-gray-50">

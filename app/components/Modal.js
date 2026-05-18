@@ -1,6 +1,9 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 export default function Modal({ isOpen, onClose, title, message, type = 'success' }) {
+  const t = useTranslations('modal')
   if (!isOpen) return null
 
   const icons = {
@@ -9,7 +12,7 @@ export default function Modal({ isOpen, onClose, title, message, type = 'success
     info: 'ℹ️',
     warning: '⚠️'
   }
-  
+
   const colors = {
     success: 'bg-green-100',
     error: 'bg-red-100',
@@ -40,7 +43,7 @@ export default function Modal({ isOpen, onClose, title, message, type = 'success
           onClick={onClose}
           className="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium"
         >
-          Entendido
+          {t('understood')}
         </button>
       </div>
     </div>

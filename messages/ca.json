@@ -14,5 +14,151 @@
     "terms": "Termes",
     "legal": "Avís legal",
     "copyright": "2026 · Herdfy"
+  },
+  "dashboard": {
+    "title": "Les meves campanyes",
+    "newCampaign": "+ Nova campanya",
+    "loading": "Carregant campanyes...",
+    "participations": "participacions",
+    "andMore": "i {count} més",
+    "edit": "Edita",
+    "view": "Veure",
+    "status": {
+      "active": "Activa",
+      "inactive": "Inactiva",
+      "draft": "Esborrany"
+    },
+    "empty": {
+      "title": "Encara no has creat cap campanya",
+      "description": "Crea la teva primera campanya i comença a mobilitzar el ramat",
+      "cta": "Crear la meva primera campanya"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Inicia sessió",
+      "subtitle": "Accedeix per gestionar les teves campanyes",
+      "submit": "Inicia sessió",
+      "noAccount": "No tens compte?",
+      "register": "Registra't",
+      "forgotPassword": "Has oblidat la contrasenya?"
+    },
+    "register": {
+      "title": "Crea un compte",
+      "subtitle": "Crea el teu compte per començar a organitzar",
+      "submit": "Crea el compte",
+      "hasAccount": "Ja tens compte?",
+      "loginLink": "Inicia sessió",
+      "captchaError": "Si us plau, completa la verificació de seguretat."
+    },
+    "forgotPassword": {
+      "title": "Recupera la contrasenya",
+      "subtitle": "Introdueix el teu email i t'enviarem un enllaç per restablir la teva contrasenya.",
+      "submit": "Envia l'enllaç",
+      "sending": "Enviant...",
+      "backToLogin": "Torna a l'inici de sessió",
+      "successTitle": "Email enviat",
+      "successMessage": "Revisa la teva safata d'entrada. T'hem enviat un enllaç per restablir la teva contrasenya."
+    },
+    "fields": {
+      "name": "Nom",
+      "namePlaceholder": "El teu nom",
+      "email": "Email",
+      "password": "Contrasenya"
+    },
+    "loading": "Carregant...",
+    "accountCreatedTitle": "Compte creat!",
+    "accountCreatedMessage": "El teu compte s'ha creat correctament. Ja pots iniciar sessió.",
+    "loginError": "Has d'iniciar sessió per crear una campanya"
+  },
+  "userMenu": {
+    "login": "Inicia sessió",
+    "myAccount": "El meu compte",
+    "myCampaigns": "Les meves campanyes",
+    "myProfile": "El meu perfil",
+    "logout": "Tanca sessió",
+    "connectedAs": "Connectat com"
+  },
+  "modal": {
+    "understood": "Entès"
+  },
+  "resetPassword": {
+    "title": "Nova contrasenya",
+    "subtitle": "Introdueix la teva nova contrasenya.",
+    "newPassword": "Nova contrasenya",
+    "confirmPassword": "Confirmar contrasenya",
+    "submit": "Desa la contrasenya",
+    "saving": "Desant...",
+    "success": "✅ Contrasenya actualitzada. Redirigint al login...",
+    "errorMismatch": "Les contrasenyes no coincideixen",
+    "errorMinLength": "La contrasenya ha de tenir almenys 6 caràcters"
+  },
+  "perfil": {
+    "username": "Nom d'usuari",
+    "profileUpdated": "✅ Perfil actualitzat",
+    "nameLabel": "Nom",
+    "namePlaceholder": "El teu nom",
+    "avatarColor": "Color de l'avatar",
+    "saveChanges": "Desa els canvis",
+    "saving": "Desant...",
+    "changePassword": "Canvia la contrasenya",
+    "passwordUpdated": "✅ Contrasenya actualitzada",
+    "newPassword": "Nova contrasenya",
+    "confirmPassword": "Confirmar nova contrasenya",
+    "changePasswordBtn": "Canvia la contrasenya",
+    "errorMismatch": "Les contrasenyes no coincideixen",
+    "errorMinLength": "La contrasenya ha de tenir almenys 6 caràcters"
+  },
+  "campaignForm": {
+    "basicInfo": "Informació bàsica",
+    "coverImage": "Imatge de portada *",
+    "imageLabel": "Imatge de portada",
+    "campaignTitle": "Títol de la campanya *",
+    "campaignTitlePlaceholder": "Ex: Protecció per als gossos de caça",
+    "titleLabel": "Títol *",
+    "description": "Descripció *",
+    "descriptionPlaceholder": "Explica per què és important aquesta campanya...",
+    "deadline": "Data límit *",
+    "status": "Estat *",
+    "statusActive": "Activa — visible per a tothom",
+    "statusInactive": "Inactiva — només visible per a tu",
+    "statusDraft": "Esborrany — només visible per a tu",
+    "autoInactiveNotice": "La campanya ha passat a inactiva automàticament perquè ha vençut la data límit.",
+    "recipients": "Destinataris",
+    "addRecipient": "+ Afegir destinatari",
+    "recipientLabel": "Destinatari {number}",
+    "removeRecipient": "Elimina",
+    "recipientName": "Nom de l'organisme *",
+    "recipientNamePlaceholder": "Ex: Ministeri d'Agricultura",
+    "recipientEmail": "Email de destí *",
+    "recipientEmailPlaceholder": "consulta@ministeri.es",
+    "messageTemplate": "Plantilla del missatge",
+    "emailSubject": "Assumpte de l'email *",
+    "emailSubjectPlaceholder": "Al·legacions al Reial Decret...",
+    "emailBody": "Cos del missatge *",
+    "variablesHint": "📌 Fes servir aquestes variables on vulguis inserir les dades del participant:",
+    "variablesHintEdit": "📌 Variables disponibles per personalitzar el missatge:",
+    "variablesNote": "Només apareixeran els camps que facis servir. Si no poses",
+    "variablesNote2": ", no ho demanarem al participant.",
+    "allowEdit": "Permetre que els participants editin el missatge",
+    "security": "Verificació de seguretat *",
+    "captchaError": "Si us plau, completa la verificació de seguretat.",
+    "creating": "Creant...",
+    "createCampaign": "Crear campanya",
+    "saving": "Desant...",
+    "saveChanges": "Desa els canvis",
+    "cancel": "Cancel·la",
+    "deleteCampaign": "🗑️ Elimina la campanya",
+    "deleteConfirmTitle": "Eliminar la campanya?",
+    "deleteConfirmMessage": "Aquesta acció no es pot desfer. La campanya i totes les seves participacions s'eliminaran permanentment.",
+    "deleteConfirmBtn": "Sí, elimina",
+    "deleting": "Eliminant...",
+    "profanityTitle": "Contingut no permès",
+    "profanityMessage": "El text conté paraules no permeses: \"{words}\".",
+    "campaignCreatedTitle": "Campanya creada!",
+    "campaignCreatedMessage": "La teva campanya s'ha creat amb èxit.",
+    "campaignUpdatedTitle": "Canvis desats!",
+    "campaignUpdatedMessage": "La campanya s'ha actualitzat correctament.",
+    "loginRequired": "Has d'iniciar sessió per crear una campanya"
   }
 }

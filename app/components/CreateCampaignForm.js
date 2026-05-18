@@ -7,10 +7,12 @@ import { useRouter } from 'next/navigation'
 import Modal from './Modal'
 import { findProfanity } from '../../lib/profanityFilter'
 import ImageUpload from './ImageUpload'
+import { useTranslations } from 'next-intl'
 
 const today = new Date().toISOString().split('T')[0]
 
 export default function CreateCampaignForm() {
+  const t = useTranslations('campaignForm')
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -83,13 +85,13 @@ export default function CreateCampaignForm() {
 
     const profanityFound = validateContent()
     if (profanityFound.length > 0) {
-      showModal('Contenido no permitido', `El texto contiene palabras no permitidas: "${profanityFound.join('", "')}".`, 'error')
+      showModal(t('profanityTitle'), t('profanityMessage', { words: profanityFound.join('", "') }), 'error')
       setLoading(false); return
     }
 
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { setError('Debes iniciar sesión para crear una campaña'); setLoading(false); return }
+      if (!user) { setError(t('loginRequired')); setLoading(false); return }
 
       const slug = generateSlug(formData.title)
       const firstRecipient = formData.recipients[0] || { name: '', email: '' }
@@ -104,7 +106,7 @@ export default function CreateCampaignForm() {
       }]).select()
 
       if (insertError) throw insertError
-      showModal('¡Campaña creada!', 'Tu campaña se ha creado con éxito.', 'success')
+      showModal(t('campaignCreatedTitle'), t('campaignCreatedMessage'), 'success')
       setTimeout(() => router.push('/dashboard'), 1800)
     } catch (err) { setError(err.message) }
     finally { setLoading(false) }
@@ -123,38 +125,38 @@ export default function CreateCampaignForm() {
         {error && <div style={{ padding: '10px 14px', background: '#fff5f5', border: '1px solid #fed7d7', color: '#c53030', borderRadius: '8px', fontSize: '13px' }}>{error}</div>}
 
         <div style={sectionStyle}>
-          <h2 style={sectionTitleStyle}>Información básica</h2>
+          <h2 style={sectionTitleStyle}>{t('basicInfo')}</h2>
           <div>
-            <label style={labelStyle}>Imagen de portada *</label>
+            <label style={labelStyle}>{t('coverImage')}</label>
             <ImageUpload error={imageError} onImageUploaded={(url) => { setFormData(prev => ({ ...prev, image_url: url })); setImageError(false) }} />
           </div>
           <div>
-            <label style={labelStyle}>Título de la campaña *</label>
-            <input type="text" name="title" value={formData.title} onChange={handleChange} required style={inputStyle} placeholder="Ej: Protección para perros de caza" />
+            <label style={labelStyle}>{t('campaignTitle')}</label>
+            <input type="text" name="title" value={formData.title} onChange={handleChange} required style={inputStyle} placeholder={t('campaignTitlePlaceholder')} />
           </div>
           <div>
-            <label style={labelStyle}>Descripción *</label>
-            <textarea rows="6" name="description" value={formData.description} onChange={handleChange} required style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.55 }} placeholder="Explica por qué es importante esta campaña..." />
+            <label style={labelStyle}>{t('description')}</label>
+            <textarea rows="6" name="description" value={formData.description} onChange={handleChange} required style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.55 }} placeholder={t('descriptionPlaceholder')} />
           </div>
           <div>
-            <label style={labelStyle}>Fecha límite *</label>
+            <label style={labelStyle}>{t('deadline')}</label>
             <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required min={today} style={inputStyle} />
           </div>
           <div>
-            <label style={labelStyle}>Estado *</label>
+            <label style={labelStyle}>{t('status')}</label>
             <select name="status" value={formData.status} onChange={handleChange} style={inputStyle}>
-              <option value="active">Activa — visible para todo el mundo</option>
-              <option value="draft">Borrador — solo visible para ti</option>
+              <option value="active">{t('statusActive')}</option>
+              <option value="draft">{t('statusDraft')}</option>
             </select>
           </div>
         </div>
 
         <div style={sectionStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h2 style={sectionTitleStyle}>Destinatarios</h2>
+            <h2 style={sectionTitleStyle}>{t('recipients')}</h2>
             <button type="button" onClick={addRecipient}
               style={{ padding: '5px 14px', background: '#f0faf5', border: '1.5px solid #3a9e7a', color: '#3a9e7a', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
-              + Añadir destinatario
+              {t('addRecipient')}
             </button>
           </div>
 
@@ -163,39 +165,39 @@ export default function CreateCampaignForm() {
               {formData.recipients.length > 1 && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3a0', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Destinatario {index + 1}
+                    {t('recipientLabel', { number: index + 1 })}
                   </span>
                   <button type="button" onClick={() => removeRecipient(index)}
                     style={{ padding: '2px 10px', background: 'transparent', border: '1px solid #fed7d7', color: '#c53030', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontSize: '12px', cursor: 'pointer' }}>
-                    Eliminar
+                    {t('removeRecipient')}
                   </button>
                 </div>
               )}
               <div>
-                <label style={labelStyle}>Nombre del organismo *</label>
+                <label style={labelStyle}>{t('recipientName')}</label>
                 <input type="text" name={`recipient_name_${index}`} value={recipient.name} onChange={(e) => handleRecipientChange(index, 'name', e.target.value)}
-                  required style={{ ...inputStyle, background: 'white' }} placeholder="Ej: Ministerio de Agricultura" />
+                  required style={{ ...inputStyle, background: 'white' }} placeholder={t('recipientNamePlaceholder')} />
               </div>
               <div>
-                <label style={labelStyle}>Email de destino *</label>
+                <label style={labelStyle}>{t('recipientEmail')}</label>
                 <input type="email" name={`recipient_email_${index}`} value={recipient.email} onChange={(e) => handleRecipientChange(index, 'email', e.target.value)}
-                  required style={{ ...inputStyle, background: 'white' }} placeholder="consulta@ministerio.es" />
+                  required style={{ ...inputStyle, background: 'white' }} placeholder={t('recipientEmailPlaceholder')} />
               </div>
             </div>
           ))}
         </div>
 
         <div style={sectionStyle}>
-          <h2 style={sectionTitleStyle}>Plantilla del mensaje</h2>
+          <h2 style={sectionTitleStyle}>{t('messageTemplate')}</h2>
           <div>
-            <label style={labelStyle}>Asunto del email *</label>
-            <input type="text" name="email_subject" value={formData.email_subject} onChange={handleChange} required style={inputStyle} placeholder="Alegaciones al Real Decreto..." />
+            <label style={labelStyle}>{t('emailSubject')}</label>
+            <input type="text" name="email_subject" value={formData.email_subject} onChange={handleChange} required style={inputStyle} placeholder={t('emailSubjectPlaceholder')} />
           </div>
           <div>
-            <label style={labelStyle}>Cuerpo del mensaje *</label>
+            <label style={labelStyle}>{t('emailBody')}</label>
             <div style={{ marginBottom: '10px', padding: '12px 14px', background: '#fffbe6', border: '1px solid #f6e05e', borderRadius: '8px' }}>
               <p style={{ fontSize: '12px', fontWeight: 600, color: '#744210', marginBottom: '8px' }}>
-                📌 Usa estas variables donde quieras insertar los datos del participante:
+                {t('variablesHint')}
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
                 {['(NOMBRE)', '(DNI)', '(LOCALIDAD)', '(FECHA)'].map(v => (
@@ -203,7 +205,7 @@ export default function CreateCampaignForm() {
                 ))}
               </div>
               <p style={{ fontSize: '11px', color: '#92400e', margin: 0 }}>
-                Solo aparecerán los campos que uses. Si no pones <code>(DNI)</code>, no se lo pediremos al participante.
+                {t('variablesNote')} <code>(DNI)</code>{t('variablesNote2')}
               </p>
             </div>
             <textarea rows="12" name="email_template" value={formData.email_template} onChange={handleChange} required
@@ -212,12 +214,12 @@ export default function CreateCampaignForm() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <input type="checkbox" id="allow_edit" name="allow_edit" checked={formData.allow_edit} onChange={handleChange} style={{ width: '16px', height: '16px', accentColor: '#3a9e7a' }} />
-            <label htmlFor="allow_edit" style={{ fontSize: '13px', color: '#4d5e56', cursor: 'pointer' }}>Permitir que los participantes editen el mensaje</label>
+            <label htmlFor="allow_edit" style={{ fontSize: '13px', color: '#4d5e56', cursor: 'pointer' }}>{t('allowEdit')}</label>
           </div>
         </div>
 
         <div style={{ background: 'white', border: '1px solid #e4e1da', borderRadius: '12px', padding: '24px' }}>
-          <p style={{ fontSize: '11px', fontWeight: 600, color: '#94a3a0', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Verificación de seguridad *</p>
+          <p style={{ fontSize: '11px', fontWeight: 600, color: '#94a3a0', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>{t('security')}</p>
           <div className="turnstile-wrapper">
             <Turnstile
               ref={turnstileRef}
@@ -229,16 +231,16 @@ export default function CreateCampaignForm() {
               style={{ width: '100%' }}
             />
           </div>
-          {captchaError && <p style={{ fontSize: '12px', color: '#e53e3e', marginTop: '6px' }}>Por favor, completa la verificación de seguridad.</p>}
+          {captchaError && <p style={{ fontSize: '12px', color: '#e53e3e', marginTop: '6px' }}>{t('captchaError')}</p>}
         </div>
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button type="submit" disabled={loading}
             style={{ flex: 1, padding: '12px', background: loading ? '#94a3a0' : '#3a9e7a', color: 'white', border: 'none', borderRadius: '100px', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '14px', cursor: loading ? 'not-allowed' : 'pointer' }}>
-            {loading ? 'Creando...' : 'Crear campaña'}
+            {loading ? t('creating') : t('createCampaign')}
           </button>
           <a href="/dashboard" style={{ padding: '12px 24px', border: '1.5px solid #e4e1da', color: '#4d5e56', borderRadius: '100px', fontSize: '14px', fontWeight: 500, textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-            Cancelar
+            {t('cancel')}
           </a>
         </div>
       </form>
