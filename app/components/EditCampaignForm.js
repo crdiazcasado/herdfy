@@ -147,7 +147,7 @@ export default function EditCampaignForm({ campaign }) {
             </div>
             <div>
               <label style={labelStyle}>Fecha límite *</label>
-              <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required min={today} style={inputStyle} />
+              <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required min={isAutoInactive ? formData.deadline : today} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Estado *</label>
