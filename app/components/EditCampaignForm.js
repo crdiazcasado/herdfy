@@ -23,6 +23,7 @@ export default function EditCampaignForm({ campaign }) {
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'success' })
 
   const isAutoInactive = campaign.status === 'active' && campaign.deadline && campaign.deadline < today
+  const deadlineMin = campaign.deadline && campaign.deadline < today ? campaign.deadline : today
 
   const [formData, setFormData] = useState({
     title: campaign.title,
@@ -147,7 +148,7 @@ export default function EditCampaignForm({ campaign }) {
             </div>
             <div>
               <label style={labelStyle}>Fecha límite *</label>
-              <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required min={today} style={inputStyle} />
+              <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required min={deadlineMin} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Estado *</label>
