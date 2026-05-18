@@ -75,14 +75,14 @@ export default function Navbar() {
 
             {/* Desktop — derecha */}
             <div className="hidden md:flex" style={{ alignItems: 'center', gap: '16px', marginLeft: 'auto' }}>
+              <UserMenu />
+              <CreateCampaignButton />
               {/* Language switcher */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                 <button onClick={() => switchLocale('es')} style={switcherStyle(locale === 'es')} disabled={locale === 'es'}>ES</button>
                 <span style={{ color: '#d1d5db', fontSize: '12px' }}>|</span>
                 <button onClick={() => switchLocale('ca')} style={switcherStyle(locale === 'ca')} disabled={locale === 'ca'}>CA</button>
               </div>
-              <UserMenu />
-              <CreateCampaignButton />
             </div>
 
             {/* Hamburguesa */}
