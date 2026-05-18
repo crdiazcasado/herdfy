@@ -19,7 +19,7 @@ export default function Navbar() {
   }
 
   const navLinkStyle = (href) => ({
-    color: isActive(href) ? '#1c2b22' : '#4d5e56',
+    color: isActive(href) ? '#3a9e7a' : '#4d5e56',
     fontSize: '14px',
     textDecoration: 'none',
     fontWeight: isActive(href) ? 600 : 500,
