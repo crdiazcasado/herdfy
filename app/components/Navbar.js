@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
+import { Link, useRouter, usePathname } from '@/lib/i18nNavigation'
 import UserMenu from './UserMenu'
 import CreateCampaignButton from './CreateCampaignButton'
 
@@ -8,18 +9,22 @@ const linkStyle = {
   color: '#4d5e56', fontSize: '14px', textDecoration: 'none',
   fontWeight: 500, transition: 'color 0.15s',
 }
-const createLinkStyle = {
-  color: '#3a9e7a', fontSize: '14px', textDecoration: 'none',
-  fontWeight: 600, transition: 'color 0.15s',
-}
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [visible, setVisible] = useState(false)
+  const t = useTranslations('nav')
+  const locale = useLocale()
+  const router = useRouter()
+  const pathname = usePathname()
 
   const closeMobileMenu = () => {
     setVisible(false)
     setTimeout(() => setMobileMenuOpen(false), 250)
+  }
+
+  const switchLocale = (newLocale) => {
+    router.replace(pathname, { locale: newLocale })
   }
 
   useEffect(() => {
@@ -31,6 +36,18 @@ export default function Navbar() {
     }
     return () => { document.body.style.overflow = '' }
   }, [mobileMenuOpen])
+
+  const switcherStyle = (isActive) => ({
+    fontSize: '12px',
+    fontWeight: isActive ? 700 : 400,
+    color: isActive ? '#1c2b22' : '#94a3a0',
+    background: 'transparent',
+    border: 'none',
+    cursor: isActive ? 'default' : 'pointer',
+    padding: '2px 4px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+  })
 
   return (
     <>
@@ -51,13 +68,19 @@ export default function Navbar() {
 
             {/* Desktop — nav centro */}
             <div className="hidden md:flex" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', alignItems: 'center', gap: '32px' }}>
-              <Link href="/" style={linkStyle}>Campañas</Link>
-              <Link href="/como-funciona" style={linkStyle}>Cómo funciona</Link>
-              <Link href="/faq" style={linkStyle}>FAQ</Link>
+              <Link href="/" style={linkStyle}>{t('campaigns')}</Link>
+              <Link href="/como-funciona" style={linkStyle}>{t('howItWorks')}</Link>
+              <Link href="/faq" style={linkStyle}>{t('faq')}</Link>
             </div>
 
             {/* Desktop — derecha */}
             <div className="hidden md:flex" style={{ alignItems: 'center', gap: '16px', marginLeft: 'auto' }}>
+              {/* Language switcher */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                <button onClick={() => switchLocale('es')} style={switcherStyle(locale === 'es')} disabled={locale === 'es'}>ES</button>
+                <span style={{ color: '#d1d5db', fontSize: '12px' }}>|</span>
+                <button onClick={() => switchLocale('ca')} style={switcherStyle(locale === 'ca')} disabled={locale === 'ca'}>CA</button>
+              </div>
               <UserMenu />
               <CreateCampaignButton />
             </div>
@@ -67,7 +90,7 @@ export default function Navbar() {
               onClick={() => mobileMenuOpen ? closeMobileMenu() : setMobileMenuOpen(true)}
               className="md:hidden"
               style={{ padding: '8px', background: 'transparent', border: 'none', cursor: 'pointer' }}
-              aria-label="Menú"
+              aria-label={t('menu')}
             >
               {mobileMenuOpen ? (
                 <svg width="24" height="24" fill="none" stroke="#1c2b22" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
@@ -110,27 +133,37 @@ export default function Navbar() {
             {/* Navegación — nivel 2 */}
             <div className="menu-anim" style={{ animationDelay: '0.14s' }}>
               <p style={{ fontSize: '11px', fontWeight: 700, color: '#94a3a0', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px', paddingLeft: '12px' }}>
-                Explorar
+                {t('explore')}
               </p>
               <Link href="/" onClick={closeMobileMenu}
                 style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#1c2b22', textDecoration: 'none' }}>
-                Campañas
+                {t('campaigns')}
               </Link>
               <Link href="/como-funciona" onClick={closeMobileMenu}
                 style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#1c2b22', textDecoration: 'none' }}>
-                Cómo funciona
+                {t('howItWorks')}
               </Link>
               <Link href="/faq" onClick={closeMobileMenu}
                 style={{ display: 'block', padding: '13px 12px', borderRadius: '10px', fontSize: '15px', fontWeight: 500, color: '#1c2b22', textDecoration: 'none' }}>
-                FAQ
+                {t('faq')}
               </Link>
+            </div>
+
+            {/* Language switcher móvil */}
+            <div className="menu-anim" style={{ animationDelay: '0.18s', marginTop: '8px' }}>
+              <div style={{ height: '1px', background: '#e4e1da', margin: '8px 0 16px' }} />
+              <div style={{ display: 'flex', gap: '8px', paddingLeft: '12px' }}>
+                <button onClick={() => { switchLocale('es'); closeMobileMenu() }} style={{ ...switcherStyle(locale === 'es'), fontSize: '14px', padding: '4px 8px' }} disabled={locale === 'es'}>ES</button>
+                <span style={{ color: '#d1d5db', fontSize: '14px', alignSelf: 'center' }}>|</span>
+                <button onClick={() => { switchLocale('ca'); closeMobileMenu() }} style={{ ...switcherStyle(locale === 'ca'), fontSize: '14px', padding: '4px 8px' }} disabled={locale === 'ca'}>CA</button>
+              </div>
             </div>
 
             {/* Crear campaña — nivel 3, acción principal */}
             <div className="menu-anim" style={{ animationDelay: '0.22s', marginTop: 'auto', paddingTop: '24px' }}>
               <div style={{ height: '1px', background: '#e4e1da', marginBottom: '20px' }} />
               <Link
-                href="/nueva-campana"
+                href="/dashboard/nueva"
                 onClick={closeMobileMenu}
                 style={{
                   display: 'block', padding: '15px',
@@ -140,7 +173,7 @@ export default function Navbar() {
                   textDecoration: 'none',
                 }}
               >
-                + Crear campaña
+                {t('createCampaign')}
               </Link>
             </div>
 
