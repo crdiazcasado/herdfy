@@ -25,7 +25,15 @@ export default async function Footer() {
           </div>
 
           <div className="text-sm text-gray-400 text-center">
-            {t('copyright')}
+            {t('copyright')}{' '}
+            <a
+              href="https://www.linkedin.com/in/crdiazcasado/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline font-medium"
+            >
+              Cristina Díaz
+            </a>
           </div>
 
         </div>
