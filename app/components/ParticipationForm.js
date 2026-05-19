@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Turnstile } from '@marsidev/react-turnstile'
-import Modal from './Modal'
 
 function getUsedFields(template) {
   return {
@@ -45,7 +44,6 @@ export default function ParticipationForm({ campaign }) {
   const [copiedRecipient, setCopiedRecipient] = useState(false)
   const [copiedSubject, setCopiedSubject] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [thankYouModal, setThankYouModal] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState(null)
   const [captchaError, setCaptchaError] = useState(false)
   const turnstileRef = useRef(null)
@@ -141,7 +139,6 @@ export default function ParticipationForm({ campaign }) {
     const body = encodeURIComponent(getFinalMessage())
     const allEmails = recipients.map(r => r.email).join(',')
     await incrementParticipation()
-    setTimeout(() => setThankYouModal(true), 800)
     window.location.href = `mailto:${allEmails}?subject=${subject}&body=${body}`
   }
 
@@ -200,14 +197,6 @@ export default function ParticipationForm({ campaign }) {
 
   return (
     <div>
-      <Modal
-        isOpen={thankYouModal}
-        onClose={() => setThankYouModal(false)}
-        title={t('thankYouTitle')}
-        message={t('thankYouMessage')}
-        type="success"
-      />
-
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
         <div>
