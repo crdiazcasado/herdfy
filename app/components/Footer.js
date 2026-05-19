@@ -27,7 +27,7 @@ export default async function Footer() {
           <div className="text-sm text-gray-400 text-center">
             {t('copyright')}{' '}
             <a
-              href="https://www.linkedin.com/in/crdiazcasado/"
+              href="https://diazcasado.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline font-medium"
