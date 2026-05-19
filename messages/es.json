@@ -184,7 +184,9 @@
     "whyImportant": "¿Por qué es importante?",
     "sharePrompt": "📣 ¿Conoces a alguien que también debería participar? ¡Comparte!",
     "recipient": "Destinatario",
-    "recipients": "Destinatarios"
+    "recipients": "Destinatarios",
+    "shareButton": "Compartir por WhatsApp",
+    "shareMessage": "¡Únete a esta campaña! {title} -"
   },
   "form": {
     "messageLabel": "Mensaje de la campaña",

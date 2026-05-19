@@ -25,7 +25,7 @@ export async function generateMetadata({ params }) {
   const campaign = await getCampaign(resolvedParams.slug)
   if (!campaign) return {}
 
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/c/${campaign.slug}`
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/${resolvedParams.locale}/c/${campaign.slug}`
   const image = campaign.image_url || `${process.env.NEXT_PUBLIC_SITE_URL}/og-default.png`
 
   return {
